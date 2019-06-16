@@ -311,3 +311,12 @@ export default function panorama(setting) {
   return {container};
 }
 
+// curry function. let addone = curry(add, 1); let x = addone(3) // x is 4
+function curry(method){
+  const slice = Array.prototype.slice;
+  const startArgs = slice.apply(arguments);
+  return function(){
+    const restArgs = slice.apply(arguments);
+    return method.apply(null, startArgs.concat(restArgs)); // call actual function
+  }
+}
