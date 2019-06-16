@@ -1,2 +1,7 @@
 .vscode/
 **/node_modules
+
+.idea
+try.js
+webgl2dtest.js
+webgl3dtest.js
