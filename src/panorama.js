@@ -1,4 +1,5 @@
 import {mat4} from './utils/gl-matrix';
+import {initShaderProgram} from './webgl-helper.js/index.js'
 
 export default function panorama(setting) {
 
