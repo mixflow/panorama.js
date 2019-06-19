@@ -11,6 +11,10 @@ export default function panorama(setting) {
   const container = setting.container;
 
   const canvas = document.createElement("canvas");
+  /* set the canvas size that is same as container size.
+   Or the render resolution would be not correct. */
+  canvas.width = container.clientWidth;
+  canvas.height = container.clientHeight;
   container.appendChild(canvas);
 
   const gl = canvas.getContext("webgl"); // gl: WebGLRenderingContext
@@ -30,24 +34,27 @@ export default function panorama(setting) {
   // Vertex shader program
   const vsSource = `
     attribute vec4 aVertexPosition;
-    attribute vec4 aVertexColor;
+    attribute vec2 aTextureCoordinate;
 
     uniform mat4 uModelViewMatrix;
     uniform mat4 uProjectionMatrix;
 
-    varying lowp vec4 vColor;
+    varying highp vec2 vTextureCoordinate;
 
     void main() {
       gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-      // vColor = aVertexColor;
+      vTextureCoordinate = aTextureCoordinate;
     }
   `;
 
   // Fragment shader program
   const fsSource = `
+    varying highp vec2 vTextureCoordinate;
+
+    uniform sampler2D uSampler;
 
     void main(void) {
-      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+      gl_FragColor = texture2D(uSampler, vTextureCoordinate);
     }
   `;
 
@@ -57,16 +64,22 @@ export default function panorama(setting) {
     program: shaderProgram,
     attribLocations: {
       vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
-      vertexColor: gl.getAttribLocation(shaderProgram, 'aVertexColor'),
+      textureCoordinate: gl.getAttribLocation(shaderProgram, 'aTextureCoordinate'),
     },
     uniformLocations: {
       projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
       modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
+      uSampler: gl.getUniformLocation(shaderProgram, 'uSampler'),
     },
   };
 
   // create one sphere vertices
-  const sphereVertices = createSphereVertices(1, 16, 16);
+  let sphereSegements = [32, 16]
+  console.log(`the number of sphere segements :${sphereSegements}`)
+  const sphereVertices = createSphereVertices(20, sphereSegements[0], sphereSegements[1]);
+  
+  const gl_loadTexture = curry(loadTexture, gl);
+  const texture = gl_loadTexture("./Forest-Day_Left.jpg");
 
   const buffers = initBuffers(gl);
   function initBuffers(gl) {
@@ -78,6 +91,13 @@ export default function panorama(setting) {
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), 
       gl.STATIC_DRAW);
+    
+    // texture parts
+    const textureCoords = sphereVertices.textureCoordinates.flat();
+    
+    const textureCoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
 
     // build the element array.
     const indices = sphereVertices.indices.flat();
@@ -89,7 +109,7 @@ export default function panorama(setting) {
 
     return {
       position: positionBuffer,
-      // color: colorBuffer,
+      textureCoordinate: textureCoordBuffer,
       indices: indexBuffer,
     }
   }
@@ -133,18 +153,18 @@ export default function panorama(setting) {
     // Now move the drawing position a bit to where we want to
     // start drawing the square.
 
-    mat4.translate(modelViewMatrix,     // destination matrix
-                   modelViewMatrix,     // matrix to translate
-                   [-0.0, 0.0, -6.0]);  // amount to translate
+    // mat4.translate(modelViewMatrix,     // destination matrix
+    //                modelViewMatrix,     // matrix to translate
+    //                [-0.0, 0.0, -6.0]);  // amount to translate
     
     // rotate the square
+    // mat4.rotate(modelViewMatrix,  // destination matrix
+    //           modelViewMatrix,  // matrix to rotate
+    //           squareRotation,   // amount to rotate in radians
+    //           [0, 0, 1]);       // axis to rotate around
     mat4.rotate(modelViewMatrix,  // destination matrix
               modelViewMatrix,  // matrix to rotate
-              squareRotation,   // amount to rotate in radians
-              [0, 0, 1]);       // axis to rotate around
-    mat4.rotate(modelViewMatrix,  // destination matrix
-              modelViewMatrix,  // matrix to rotate
-              squareRotation,   // amount to rotate in radians
+              squareRotation * 0.2,   // amount to rotate in radians
               [0, 1, 0]);       // axis to rotate around
             
 
@@ -169,6 +189,20 @@ export default function panorama(setting) {
           programInfo.attribLocations.vertexPosition);
     }
 
+    // tell webgl how to pull out the texture coordinates from buffer
+    {
+      const numComponents = 2; // every coordinate composed of 2 values
+      const type = gl.FLOAT; // the data in the buffer is 32 bit float
+      const normalize = false; // don't normalize
+      const stride = 0; // how many bytes to get from one set to the next
+      const offset = 0; // how many bytes inside the buffer to start from
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textureCoordinate);
+      gl.vertexAttribPointer(
+        programInfo.attribLocations.textureCoordinate,
+         numComponents, type, normalize, stride, offset);
+      gl.enableVertexAttribArray(programInfo.attribLocations.textureCoordinate);
+    }
+
     // Tell WebGL which indices to use to index the vertices
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
 
@@ -187,7 +221,16 @@ export default function panorama(setting) {
         false,
         modelViewMatrix);
 
-    
+    /* Specify the texture to map onto the faces. */
+
+    // Tell WebGL we want to affect texture unit 0
+    gl.activeTexture(gl.TEXTURE0);
+
+    // Bind the texture to texture unit 0
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+
+    // Tell the shader we bound the texture to texture unit 0
+    gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
 
     {
       const vertexCount = sphereVertices.indices.length*3;
@@ -218,6 +261,65 @@ export default function panorama(setting) {
   // drawScene(gl, programInfo, buffers);
 
   return {container};
+} // [end] function panorama
+
+/**
+ * 
+ * @param {WebGLRenderingContext} gl 
+ * @param {string} url image url
+ */
+function loadTexture(gl, url){
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+
+  const level = 0;
+  const internalFormat = gl.RGBA;
+  const srcFormat = gl.RGBA;
+  const srcType = gl.UNSIGNED_BYTE;
+
+  const pixel = new Uint8Array([0, 0, 255, 128]);  // opaque blue
+  const width = 1;
+  const height = 1;
+  const border = 0;
+  gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+                width, height, border, srcFormat, srcType,
+                pixel);
+
+
+  // TODO seperate/extract the image part from WebGL texture part.
+  const image = new Image();
+
+  image.crossOrigin = "anonymous"; // solve CROS problem
+  image.onload = function() {
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+                  srcFormat, srcType, image);
+
+    // WebGL1 has different requirements for power of 2 images
+    // vs non power of 2 images so check if the image is a
+    // power of 2 in both dimensions.
+    if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+       // Yes, it's a power of 2. Generate mips.
+      gl.generateMipmap(gl.TEXTURE_2D);
+      console.debug('generate mipmaps of texture.');
+    } else {
+      // No, it's not a power of 2. Turn off mips and set
+      
+      // wrapping to clamp to edge
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+      // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    }
+  };
+  image.src = url;
+
+  return texture;
+}
+
+function isPowerOf2(value){
+  return (value & (value - 1)) === 0; // binary bit operation trick 
 }
 
 // curry function. let addone = curry(add, 1); let x = addone(3) // x is 4
