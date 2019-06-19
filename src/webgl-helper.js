@@ -45,7 +45,7 @@ export function createSphereVertices(
   }
 
   // generate the indices of the triangles.
-  const numVerticalSegmentVertices = numHorizonalSegements + 1;
+  const numVerticalSegmentVertices = numVerticalSegments + 1;
   let indices = [];
   for (let i = 0; i < numVerticalSegments; i += 1) {
     for (let j = 0; j < numHorizonalSegements; j += 1){
@@ -61,7 +61,7 @@ export function createSphereVertices(
         j * numVerticalSegmentVertices + (i + 1),
         (j + 1) * numVerticalSegmentVertices + i
       ]
-      /* triangle 1 
+      /* triangle 2
                  *1   
                / |         
             /    |
