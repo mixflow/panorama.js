@@ -223,7 +223,7 @@ export default function panorama(setting) {
 // curry function. let addone = curry(add, 1); let x = addone(3) // x is 4
 function curry(method){
   const slice = Array.prototype.slice;
-  const startArgs = slice.apply(arguments);
+  const startArgs = slice.apply(arguments).slice(1); // exclude the 1st method argument
   return function(){
     const restArgs = slice.apply(arguments);
     return method.apply(null, startArgs.concat(restArgs)); // call actual function
