@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="dist/panorama.js"></script>
+    <style>
+        #viewer {
+            width: 1000px;
+            height: 600px;
+        }
+
+        #viewer canvas{
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="viewer"></div>
+    <script>
+        const viewer = document.getElementById("viewer");
+        
+        let panoramajs = panorama({
+            container: viewer,
+            url: "images/Forest-Day_Left.jpg",
+        
+        });
+    </script>
+</body>
+</html>

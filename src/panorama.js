@@ -79,7 +79,7 @@ export default function panorama(setting) {
   const sphereVertices = createSphereVertices(20, sphereSegements[0], sphereSegements[1]);
   
   const gl_loadTexture = curry(loadTexture, gl);
-  const texture = gl_loadTexture("./Forest-Day_Left.jpg");
+  const texture = gl_loadTexture(setting.url);
 
   const buffers = initBuffers(gl);
   function initBuffers(gl) {
