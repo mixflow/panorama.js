@@ -1,20 +1,26 @@
 import {mat4} from './utils/gl-matrix';
 import {initShaderProgram, createSphereVertices} from './webgl-helper'
 
+/**
+ * 
+ * @param {Object} setting  the setting of panorama.js. 
+ * @param {string|DOMElement} [setting.container=document.body] To specify which container that the panorama puts in, can be either css selector string(like "#id" ".clazzname" "div#id") or DOMElement(like document.querySelector("#id"), document.getElementById("id") ).
+ * @param {string} setting.src the image url of the actual panorama.
+ * @param {number} [setting.fov=90] the Field Of View in degrees, the camera view angle scope.
+ */
 export default function panorama(setting) {
 
-  const CLAZZ = "panorama";
+  const CLAZZ = "panorama"; // css class name. [NOT USED YET]
 
-
-  setting = setting || {};
+  setting = handleSetting(setting);
 
   const container = setting.container;
 
   const canvas = document.createElement("canvas");
   /* set the canvas size that is same as container size.
    Or the render resolution would be not correct. */
-  canvas.width = container.clientWidth;
-  canvas.height = container.clientHeight;
+  canvas.width = container.clientWidth * setting.canvasResolutionRatio;
+  canvas.height = container.clientHeight * setting.canvasResolutionRatio;
   container.appendChild(canvas);
 
   const gl = canvas.getContext("webgl"); // gl: WebGLRenderingContext
@@ -277,7 +283,8 @@ function loadTexture(gl, url){
   const srcFormat = gl.RGBA;
   const srcType = gl.UNSIGNED_BYTE;
 
-  const pixel = new Uint8Array([0, 0, 255, 128]);  // opaque blue
+  // grey placeholder color before texture loaded // [0,0,255,128]opaque blue
+  const pixel = new Uint8Array([0, 0, 0, 128]); 
   const width = 1;
   const height = 1;
   const border = 0;
@@ -318,6 +325,46 @@ function loadTexture(gl, url){
   return texture;
 }
 
+/*
+  panorama helper function
+ */
+
+function handleSetting(setting){
+  setting = setting || {};
+  
+  const defaultSetting = {
+    container: document.body,
+    url: undefined,
+    
+    canvasResolutionRatio: 1,
+    
+    fov: 90,
+    
+  }
+
+  // thes option must be contained 
+  if (!setting.url || typeof setting.url !== "string") {
+    throw Error("Missing `url` in `setting` or The type of `url` isn't correct: the image url must be passed in `setting`, and it should be string.")
+  }
+
+  // fill the missing setting with default
+  for (let key in defaultSetting) {
+    if (!(key in setting)){
+      setting[key] = defaultSetting[key];
+    }
+  }
+
+  // container can be either string or DOMElement
+  if (typeof setting.container === "string") {
+    setting.container = document.querySelector(setting.container);
+  } // else DOMElement
+
+  return setting;
+}
+
+/* 
+  JS helper function
+ */
 function isPowerOf2(value){
   return (value & (value - 1)) === 0; // binary bit operation trick 
 }
