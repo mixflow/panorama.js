@@ -51,10 +51,11 @@ export function createSphereVertices(
     for (let j = 0; j < numHorizonalSegements; j += 1){
       // two triangles of one face
       /* triangle 1 
-          *1-----*2
-          |    /
-          |  / 
-          *3
+           *1   
+           |  \
+           |    \
+          *2-----*3
+
       */
       let idx1 = [
         j * numVerticalSegmentVertices + i,
@@ -62,10 +63,10 @@ export function createSphereVertices(
         (j + 1) * numVerticalSegmentVertices + i
       ]
       /* triangle 2
-                 *1   
-               / |         
-            /    |
-          *2-----*3
+          *1-----*2
+            \    |
+              \  |
+                *3  
       */
       let idx2 = [
         j * numVerticalSegmentVertices + (i + 1),
