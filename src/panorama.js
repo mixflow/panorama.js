@@ -1,26 +1,27 @@
-import {mat4} from './utils/gl-matrix';
-import {initShaderProgram, createSphereVertices} from './webgl-helper'
+"use strict";
+
+import { mat4 } from './utils/gl-matrix';
+import { initShaderProgram, createSphereVertices } from './webgl-helper';
 
 /**
- * 
- * @param {Object} setting  the setting of panorama.js. 
+ * Panorama.js. create panorama
+ *
+ * @param {Object} setting  the setting of panorama.js.
  * @param {string|DOMElement} [setting.container=document.body] To specify which container that the panorama puts in, can be either css selector string(like "#id" ".clazzname" "div#id") or DOMElement(like document.querySelector("#id"), document.getElementById("id") ).
  * @param {string} setting.src the image url of the actual panorama.
  * @param {number} [setting.fov=90] the Field Of View in degrees, the camera view angle scope.
  */
 export default function panorama(setting) {
-
-  const CLAZZ = "panorama"; // css class name. [NOT USED YET]
+  
+  // const CLAZZ = 'panorama'; // css class name. [NOT USED YET]
 
   setting = handleSetting(setting);
 
   const container = setting.container;
 
   const canvas = document.createElement("canvas");
-  /* set the canvas size that is same as container size.
-   Or the render resolution would be not correct. */
-  canvas.width = container.clientWidth * setting.canvasResolutionRatio;
-  canvas.height = container.clientHeight * setting.canvasResolutionRatio;
+  canvas.width = container.clientWidth;
+  canvas.height = container.clientHeight;
   container.appendChild(canvas);
 
   const gl = canvas.getContext("webgl"); // gl: WebGLRenderingContext
@@ -28,7 +29,10 @@ export default function panorama(setting) {
   // not support Webgl
   if (gl === null) {
     // TODO warnig the msg that webgl isn't avaiable.
-    return;
+    throw Error({
+      type: "Not support WebGL", 
+      msg: "WebGL isn't support. the panorama will not work.",
+    });
   }
 
   // Set clear color to black, fully opaque
@@ -81,11 +85,10 @@ export default function panorama(setting) {
 
   // create one sphere vertices
   let sphereSegements = [32, 16]
-  console.log(`the number of sphere segements :${sphereSegements}`)
-  const sphereVertices = createSphereVertices(20, sphereSegements[0], sphereSegements[1]);
+  const sphereVertices = createSphereVertices(2, sphereSegements[0], sphereSegements[1]);
   
-  const gl_loadTexture = curry(loadTexture, gl);
-  const texture = gl_loadTexture(setting.url);
+  const gl_loadTexture = curry(loadTexture, gl); // method, first argument
+  const texture = gl_loadTexture(setting.url, ()=>{needToRedraw = true;});
 
   const buffers = initBuffers(gl);
   function initBuffers(gl) {
@@ -138,7 +141,7 @@ export default function panorama(setting) {
     // and we only want to see objects between 0.1 units
     // and 100 units away from the camera.
 
-    const fieldOfView = 45 * Math.PI / 180;   // in radians
+    const fieldOfView = setting.fov * Math.PI / 180;   // in radians
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     const zNear = 0.1;
     const zFar = 100.0;
@@ -166,12 +169,8 @@ export default function panorama(setting) {
     // rotate the square
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //           modelViewMatrix,  // matrix to rotate
-    //           squareRotation,   // amount to rotate in radians
-    //           [0, 0, 1]);       // axis to rotate around
-    mat4.rotate(modelViewMatrix,  // destination matrix
-              modelViewMatrix,  // matrix to rotate
-              squareRotation * 0.2,   // amount to rotate in radians
-              [0, 1, 0]);       // axis to rotate around
+    //           squareRotation * 0.2,   // amount to rotate in radians
+    //           [0, 1, 0]);       // axis to rotate around
             
 
     // Tell WebGL how to pull out the positions from the position
@@ -246,23 +245,38 @@ export default function panorama(setting) {
     }
   }
 
-  
+  /**
+   * Check the display size(`canvas.clientWidth` and `canvas.clientHeight`) whether it's changed.
+   * Update the canvas render size(`canvas.width` and `canvas.height`) to the current display size.
+   * And return `true` when the size is changed, otherwise `false`
+   * 
+   * @return {boolean} true: need resize; false: no need.
+   */
+  function resize(){
+    const clientWidth = gl.canvas.clientWidth;
+    const clientHeight = gl.canvas.clientHeight;
 
-  let then = 0;
+    if (gl.canvas.width !== clientWidth || gl.canvas.height !== clientHeight){
+      gl.canvas.width = clientWidth;
+      gl.canvas.height = clientHeight;
+      return true;
+    }
+    return false;
+  }
 
+  let needToRedraw = true;
   // Draw the scene repeatedly
-  function render(now) {
-    now *= 0.001;  // convert to seconds from millseconds
-    const deltaTime = now - then;
-    then = now;
-
-    squareRotation += deltaTime;
-
-    drawScene(gl, programInfo, buffers);
+  function render() {
+    if(resize() || needToRedraw){
+      // need draw
+      needToRedraw = false;
+      drawScene(gl, programInfo, buffers);
+    }
 
     requestAnimationFrame(render);
   }
-  requestAnimationFrame(render);
+
+  render(); // init call `render()`
 
   // drawScene(gl, programInfo, buffers);
 
@@ -274,7 +288,7 @@ export default function panorama(setting) {
  * @param {WebGLRenderingContext} gl 
  * @param {string} url image url
  */
-function loadTexture(gl, url){
+function loadTexture(gl, url, successCallback){
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
@@ -308,16 +322,22 @@ function loadTexture(gl, url){
     if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
        // Yes, it's a power of 2. Generate mips.
       gl.generateMipmap(gl.TEXTURE_2D);
-      console.debug('generate mipmaps of texture.');
+      // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+      console.log("mipmap texture");
     } else {
       // No, it's not a power of 2. Turn off mips and set
-      
       // wrapping to clamp to edge
+      
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
       // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    }
+
+    // callback after loaded.
+    if (successCallback) {
+      successCallback();
     }
   };
   image.src = url;
@@ -336,11 +356,9 @@ function handleSetting(setting){
     container: document.body,
     url: undefined,
     
-    canvasResolutionRatio: 1,
+    fov: 60,
     
-    fov: 90,
-    
-  }
+  };
 
   // thes option must be contained 
   if (!setting.url || typeof setting.url !== "string") {
