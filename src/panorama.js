@@ -17,7 +17,7 @@ export default function panorama(setting) {
 
   setting = handleSetting(setting);
 
-  const container = setting.container;
+  const {container, url, fov} = setting;
 
   const canvas = document.createElement("canvas");
   canvas.width = container.clientWidth;
@@ -35,6 +35,7 @@ export default function panorama(setting) {
     });
   }
 
+  // gl.enable(gl.CULL_FACE); // only draw the front face which the vertices is drawn clockwise.
   // Set clear color to black, fully opaque
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   // Clear the color buffer with specified clear color
@@ -88,7 +89,7 @@ export default function panorama(setting) {
   const sphereVertices = createSphereVertices(2, sphereSegements[0], sphereSegements[1]);
   
   const gl_loadTexture = curry(loadTexture, gl); // method, first argument
-  const texture = gl_loadTexture(setting.url, ()=>{needToRedraw = true;});
+  const texture = gl_loadTexture(url, ()=>{needToRedraw = true;});
 
   const buffers = initBuffers(gl);
   function initBuffers(gl) {
@@ -141,7 +142,7 @@ export default function panorama(setting) {
     // and we only want to see objects between 0.1 units
     // and 100 units away from the camera.
 
-    const fieldOfView = setting.fov * Math.PI / 180;   // in radians
+    const fieldOfView = fov * Math.PI / 180;   // in radians
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     const zNear = 0.1;
     const zFar = 100.0;
@@ -356,7 +357,7 @@ function handleSetting(setting){
     container: document.body,
     url: undefined,
     
-    fov: 60,
+    fov: 90,
     
   };
 
