@@ -156,9 +156,18 @@ export default function panorama(setting) {
                      zNear,
                      zFar);
 
+    // Camera matrix
+
+
+    const cameraMatrix = mat4.create();
+    const targetPosition = [0, 0, -1];
+    const cameraUp = [0, 1, 0];
+    mat4.lookAt(cameraMatrix, [0,0,0], targetPosition, cameraUp);
+
     // Set the drawing position to the "identity" point, which is
     // the center of the scene.
-    const modelViewMatrix = mat4.create();
+    const modelViewMatrix =  mat4.create();
+    mat4.invert(modelViewMatrix, cameraMatrix); 
 
     // Now move the drawing position a bit to where we want to
     // start drawing the square.
