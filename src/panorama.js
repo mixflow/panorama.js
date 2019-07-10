@@ -294,6 +294,95 @@ export default function panorama(setting) {
 } // [end] function panorama
 
 /**
+ * Transform the latitude and longitude to the correspond vertex in [x,y,z]. (the target point in the sphere whose radius is 1)
+ * 
+ * @param {number} latitude the radian of latitude, normally from -PI to PI.
+ * @param {number} longitude the radian of logitude, normally from 0 to 2*PI.
+ */
+function latlonToVertex(latitude, longitude){
+  const theta = longitude; 
+  const phi = latitude;
+
+  const sinTheta = Math.sin(theta), cosTheta = Math.cos(theta);
+  const sinPhi = Math.sin(phi), costPhi = Math.cos(phi);
+
+  const ux = cosTheta * sinPhi;
+  const uy = costPhi;
+  const uz = sinTheta * sinPhi;
+
+  return [ux, uy, uz];
+}
+
+/**
+ * Generate the three event handler for user's input control when is dragging. 
+ * `startHandler` is used for the begin of the dragging control, handle `mouseDown` event or `touchStart` event.
+ * `moveHandler` is used when user is dragging, handle `mouseMove` event or `touchMove` event.
+ * `endHandler` is used for the end of the dragging control, handle `mouseUp` or  `touchEnd` event.
+ * 
+ * @param {function} draggingCallback the callback function handle user drag movement when user is dragging. passed two arguments current lantitude and longtitude that the camera lookAt(target position)
+ * @param {boolean} [isTouch=false] true if user use touch device to drag and move, false otherwise(like mouse).
+ * @param {number} [moveSpeed=1] the multiplier of the user movement speed, default it's 1 that is normal speed and no change.
+ */
+const userControlHandler = (function (){
+  
+  // the start position of Latitude in degrees. Usually it's from -90 which is north pole to 90  which is south pole.
+  // the start position of longitude in degrees. Usually it's from 0 to 360
+  let latitude = 0;
+  let longitude = 0;
+  
+  // actually the function
+  return function (draggingCallback, isTouch, moveSpeed) {
+  
+    let startX = 0;
+    let startY = 0;
+    let isUserDragging = false; // true during user drags 
+
+    // set default value 1 to moveSpeed
+    if (typeof moveSpeed === "undefined") {moveSpeed = 1;} 
+  
+    // get clientX and clientY either from mouse(click) or touch.  
+    const getXY = isTouch ? 
+      (eventTarget) => ({x: eventTarget.changedTouches[0].clientX, y: eventTarget.changedTouches[0].clientY}) :
+      (eventTarget) => ({x: eventTarget.clientX, y: eventTarget.clientX});
+  
+  
+    function startHandler(event){
+      event.prevent_default();
+
+      isUserDragging = true;
+      
+      let {x, y} = getXY(event);
+      startX = x;
+      startY = y;
+    }
+  
+    function moveHandler(event){
+      
+      if (isUserDragging === true) {
+        let {x, y} = getXY(event);
+        let deltaX = x - startX;
+        let deltaY = y - startY;
+    
+        latitude += deltaY * moveSpeed;
+        longitude += deltaX * moveSpeed;
+        
+        draggingCallback(latitude, longitude);
+      }
+    }
+
+    function endHandler(event){
+      isUserDragging = false; // reset 
+    }
+  
+    return {
+      startHandler,
+      moveHandler,
+      endHandler,
+    };
+  }; // [end] return actual function
+})();
+
+/**
  * 
  * @param {WebGLRenderingContext} gl 
  * @param {string} url image url
