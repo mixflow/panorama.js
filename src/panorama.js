@@ -315,11 +315,12 @@ function latlonToVertex(latitude, longitude){
 
 /**
  * Generate the three event handler for user's input control when is dragging. 
- * `startHandler` is used for the begin of the dragging control, handle `mouseDown` event or `touchStart` event.
- * `moveHandler` is used when user is dragging, handle `mouseMove` event or `touchMove` event.
- * `endHandler` is used for the end of the dragging control, handle `mouseUp` or  `touchEnd` event.
+ * `startHandler` is used for the begin of the dragging control, handle `mousedown` event or `touchstart` event.
+ * `moveHandler` is used when user is dragging, handle `mousemove` event or `touchmove` event.
+ * `endHandler` is used for the end of the dragging control, handle `mouseup` or  `touchend` event.
  * 
- * @param {function} draggingCallback the callback function handle user drag movement when user is dragging. passed two arguments current lantitude and longtitude that the camera lookAt(target position)
+ * @param {function} draggingCallback the callback function handle user drag movement when user is dragging. 
+ *  passed two arguments current deltaX and deltaY(user movement in pixel) that is used later to compute the camera `look at` (target position).
  * @param {boolean} [isTouch=false] true if user use touch device to drag and move, false otherwise(like mouse).
  * @param {number} [moveSpeed=1] the multiplier of the user movement speed, default it's 1 that is normal speed and no change.
  */
@@ -343,11 +344,13 @@ const userControlHandler = (function (){
     // get clientX and clientY either from mouse(click) or touch.  
     const getXY = isTouch ? 
       (eventTarget) => ({x: eventTarget.changedTouches[0].clientX, y: eventTarget.changedTouches[0].clientY}) :
-      (eventTarget) => ({x: eventTarget.clientX, y: eventTarget.clientX});
+      (eventTarget) => ({x: eventTarget.clientX, y: eventTarget.clientY});
   
   
     function startHandler(event){
-      event.prevent_default();
+      event.preventDefault();
+
+      console.log('down event');
 
       isUserDragging = true;
       
@@ -363,10 +366,10 @@ const userControlHandler = (function (){
         let deltaX = x - startX;
         let deltaY = y - startY;
     
-        latitude += deltaY * moveSpeed;
-        longitude += deltaX * moveSpeed;
+        deltaX = deltaX * moveSpeed;
+        deltaY = deltaY * moveSpeed;
         
-        draggingCallback(latitude, longitude);
+        draggingCallback(deltaX, deltaY);
       }
     }
 
