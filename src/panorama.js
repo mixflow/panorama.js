@@ -10,6 +10,12 @@ import { initShaderProgram, createSphereVertices } from './webgl-helper';
  * @param {string|DOMElement} [setting.container=document.body] To specify which container that the panorama puts in, can be either css selector string(like "#id" ".clazzname" "div#id") or DOMElement(like document.querySelector("#id"), document.getElementById("id") ).
  * @param {string} setting.src the image url of the actual panorama.
  * @param {number} [setting.fov=90] the Field Of View in degrees, the camera view angle scope.
+ * @param {number array} [setting.cameraDegree=[0,0]] two numbers represent the horizonal and vertical degrees of camera,
+ *  default is [0,0] which means the default start point of the panorama image.
+ *  the first number ranges from 0 to 360 which is horizonal degree which is the direction that camera looks on the horizon. 
+ *  the second number ranges from -90 to 90 (totally 180 degrees)  which is vertical degrees or the Pitch angle when look up or look down,
+ *  positive numbers(0 to 90) are the degrees that looks up, 90 is the north pole(the top);
+ *  negative numbers(-90 to 0) are the degrees that looks down, -90 is the south pole(the bottom);
  */
 export default function panorama(setting) {
   
@@ -17,7 +23,7 @@ export default function panorama(setting) {
 
   setting = handleSetting(setting);
 
-  const {container, url, fov} = setting;
+  const {container, url, fov, cameraDegree} = setting;
 
   const canvas = document.createElement("canvas");
   canvas.width = container.clientWidth;
@@ -86,7 +92,8 @@ export default function panorama(setting) {
 
   // create one sphere vertices
   let sphereSegements = [32, 16];
-  const sphereVertices = createSphereVertices(2, sphereSegements[0], sphereSegements[1]);
+  const radius = 15;
+  const sphereVertices = createSphereVertices(radius, sphereSegements[0], sphereSegements[1]);
   
   const gl_loadTexture = curry(loadTexture, gl); // method, first argument
   const texture = gl_loadTexture(url, ()=>{needToRedraw = true;});
@@ -124,9 +131,18 @@ export default function panorama(setting) {
     };
   }
 
-  let squareRotation = 0.0;
-  let targetPosition = latlonToVertex(Math.PI / 2, 0); // camera target position
-  console.log(targetPosition);
+  /**
+   * Carefully! the range of user setting vertical degrees (-90 to 90) is 
+   * the reversed order of the latitude(0 to Math.PI) that develops need, also with the offset of half of PI. 
+   * latitude 0 means the north pole(the top) that is the user setting degree 90.
+   * 
+   * Why make user setting and actual data such different? 
+   * Anwser: easy for use. `[0,0]`as startpoint matches the man's intuition.
+   */
+  let latitude =  -degreeToRadian(cameraDegree[1]) + (Math.PI / 2);
+  let longitude =  degreeToRadian(cameraDegree[0]); // trans to radian directly 
+  let targetPosition = latlonToVertex(latitude, longitude); // camera target position
+
   function drawScene(gl, programInfo, buffers) {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
     gl.clearDepth(1.0);                 // Clear everything
@@ -251,9 +267,58 @@ export default function panorama(setting) {
     }
   } //[end] drawScene function
 
+  const {updateCamera, finishUpdateCamera} = (function(){
+    // store current latitude and longitude during dragging.
+    // only update the actual latitude and longitude after finish dragging.
+    let lat;
+    let lon;
+
+    /**
+     *  The function to change the camera's target that it looks at, 
+     *  Also the callback function that is passed in the drag and move event.
+     * 
+     * @param {number} deltaX the current latitude which camera targets
+     * @param {number} deltaY  the current longitude which camera targets
+     */
+    function updateCamera(deltaX, deltaY) {
+      // update the latlon by adding delta value
+      // Treat the delta value as the movement on the circumference(very close), 
+      // and calculate the ratio of the movement over circumference and get the radian
+      // delta longitude = deltaX / circumference * (2*Math.PI), 
+      // becasuse circumference is (2*Math.PI*radius), so the simplify formular is deltaX / radius.
+      let deltaLon = deltaX / radius;
+      let delatLat = deltaY / radius;
+  
+      lat = delatLat+latitude;
+      lon = deltaLon+longitude;
+      
+      // lock latitude range, not pass two poles 
+      const maxLat = Math.PI * (1 - 0.05);
+      const minLat = Math.PI * (0 + 0.05);
+      if (lat > maxLat) {
+        lat = maxLat;
+      } else if (lat < minLat) {
+        lat = minLat;
+      }
+  
+      // compute the lookAt vertice.
+      targetPosition = latlonToVertex(lat, lon);
+  
+      needToRedraw = true; // redraw the scene
+    }
+
+    function finishUpdateCamera() {
+      // update the actual varible latitude and longitude until dragging is done.
+      latitude = lat;
+      longitude = lon;
+    }
+
+    return {updateCamera, finishUpdateCamera};
+  })();
+
   // handle user input and control the camera, mouse and touch
-  let mouseEventHandlers = userControlHandler(updateCamera, false, 0.02);
-  let touchEventHandlers = userControlHandler(updateCamera, true);
+  let mouseEventHandlers = userControlHandler(updateCamera, finishUpdateCamera, false);
+  let touchEventHandlers = userControlHandler(updateCamera, finishUpdateCamera, true);
 
 
   // register mouse drag events
@@ -270,34 +335,6 @@ export default function panorama(setting) {
     canvas.addEventListener(touchEventTypes[idx], touchEventHandlers[key], false);
   });
 
-  /**
-   *  The function to change the camera's target that it looks at, 
-   *  Also the callback function that is passed in the drag and move event.
-   * 
-   * @param {number} deltaX the current latitude which camera targets
-   * @param {number} deltaY  the current longitude which camera targets
-   */
-  function updateCamera(deltaX, deltaY) {
-    // TODO deltaX Y to lon lat in radius
-    const radius = 2;
-    let lon = deltaX;
-    let lat = deltaY+ Math.PI / 2;
-    
-    // let latitude = deltaY ;
-    // let longitude = deltaX ;
-    // console.table(latitude, longitude);
-    // lock latitude range, not pass two poles 
-    const maxLat = Math.PI * (1 - 0.1), minLat = Math.PI * (0 + 0.1);
-    if (lat > maxLat) {
-      lat = maxLat;
-    } else if (lat < minLat) {
-      lat = minLat;
-    }
-    targetPosition = latlonToVertex(lat, lon);
-    console.table([lon,lat, targetPosition.join(',')], ["longitude", "latitude", "xyz"]);
-
-    needToRedraw = true; // redraw the scene
-  }
 
   /**
    * Check the display size(`canvas.clientWidth` and `canvas.clientHeight`) whether it's changed.
@@ -497,11 +534,15 @@ function handleSetting(setting){
   setting = setting || {};
   
   const defaultSetting = {
+    // the DOMelement(or the CSS seletor string that refers the DOMElement) container that contains this panorama.js component
     container: document.body,
+    // the image url of the panorama
     url: undefined,
     
+    // the field of view
     fov: 90,
-    
+    // the inital degree of the camerea view, default is [0,0] which means to look front on the horizon
+    cameraDegree: [0, 0]
   };
 
   // thes option must be contained 
