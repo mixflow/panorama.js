@@ -372,66 +372,60 @@ function latlonToVertex(latitude, longitude){
  * @param {boolean} [isTouch=false] true if user use touch device to drag and move, false otherwise(like mouse).
  * @param {number} [moveSpeed=1] the multiplier of the user movement speed, default it's 1 that is normal speed and no change.
  */
-const userControlHandler = (function (){
+const userControlHandler = function (draggingCallback, endDragCallback, isTouch, moveSpeed) {
   
-  // the start position of Latitude in degrees. Usually it's from -90 which is north pole to 90  which is south pole.
-  // the start position of longitude in degrees. Usually it's from 0 to 360
-  let latitude = 0;
-  let longitude = 0;
-  
-  // actually the function
-  return function (draggingCallback, isTouch, moveSpeed) {
-  
-    let startX = 0;
-    let startY = 0;
-    let isUserDragging = false; // true during user drags 
+  let startX = 0;
+  let startY = 0;
+  let isUserDragging = false; // true during user drags 
 
-    // set default value 1 to moveSpeed
-    if (typeof moveSpeed === "undefined") {moveSpeed = 1;} 
-  
-    // get clientX and clientY either from mouse(click) or touch.  
-    const getXY = isTouch ? 
-      (eventTarget) => ({x: eventTarget.changedTouches[0].clientX, y: eventTarget.changedTouches[0].clientY}) :
-      (eventTarget) => ({x: eventTarget.clientX, y: eventTarget.clientY});
-  
-  
-    function startHandler(event){
-      event.preventDefault();
+  // set default value 1 to moveSpeed
+  if (typeof moveSpeed === "undefined") {moveSpeed = 1;} 
 
-      console.log('down event');
+  // get clientX and clientY either from mouse(click) or touch.  
+  const getXY = isTouch ? 
+    (eventTarget) => ({x: eventTarget.changedTouches[0].clientX, y: eventTarget.changedTouches[0].clientY}) :
+    (eventTarget) => ({x: eventTarget.clientX, y: eventTarget.clientY});
 
-      isUserDragging = true;
-      
-      let {x, y} = getXY(event);
-      startX = x;
-      startY = y;
-    }
-  
-    function moveHandler(event){
-      
-      if (isUserDragging === true) {
-        let {x, y} = getXY(event);
-        let deltaX = x - startX;
-        let deltaY = y - startY;
+
+  function startHandler(event){
+    event.preventDefault();
+
+    console.log('down event');
+
+    isUserDragging = true;
     
-        deltaX = deltaX * moveSpeed;
-        deltaY = deltaY * moveSpeed;
-        
-        draggingCallback(deltaX, deltaY);
-      }
-    }
+    let {x, y} = getXY(event);
+    startX = x;
+    startY = y;
+  }
 
-    function endHandler(event){
-      isUserDragging = false; // reset 
-    }
+  function moveHandler(event){
+    
+    if (isUserDragging === true) {
+      let {x, y} = getXY(event);
+      let deltaX = x - startX;
+      let deltaY = y - startY;
   
-    return {
-      startHandler,
-      moveHandler,
-      endHandler,
-    };
-  }; // [end] return actual function
-})();
+      deltaX = deltaX * moveSpeed;
+      deltaY = deltaY * moveSpeed;
+      
+      draggingCallback(deltaX, deltaY);
+    }
+  }
+
+  function endHandler(event){
+    isUserDragging = false; // reset 
+
+    endDragCallback();
+  }
+
+  return {
+    startHandler,
+    moveHandler,
+    endHandler,
+  };
+}; // [end] return actual function
+
 
 /**
  * 
