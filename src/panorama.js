@@ -1,6 +1,5 @@
 "use strict";
 
-import { mat4 } from './utils/gl-matrix';
 import m4  from './utils/m4';
 import { initShaderProgram, createSphereVertices } from './webgl-helper';
 
@@ -86,7 +85,7 @@ export default function panorama(setting) {
   };
 
   // create one sphere vertices
-  let sphereSegements = [32, 16]
+  let sphereSegements = [32, 16];
   const sphereVertices = createSphereVertices(2, sphereSegements[0], sphereSegements[1]);
   
   const gl_loadTexture = curry(loadTexture, gl); // method, first argument
@@ -122,7 +121,7 @@ export default function panorama(setting) {
       position: positionBuffer,
       textureCoordinate: textureCoordBuffer,
       indices: indexBuffer,
-    }
+    };
   }
 
   let squareRotation = 0.0;
@@ -149,21 +148,13 @@ export default function panorama(setting) {
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     const zNear = 0.1;
     const zFar = 100.0;
-    const projectionMatrix = mat4.create();
-
-    // note: glmatrix.js always has the first argument
-    // as the destination to receive the result.
-    mat4.perspective(projectionMatrix,
-                     fieldOfView,
-                     aspect,
-                     zNear,
-                     zFar);
+    const projectionMatrix = m4.perspective(
+      fieldOfView,
+      aspect,
+      zNear,
+      zFar);
 
     // Camera matrix
-
-
-    
-    
     const cameraUp = [0, 1, 0];
     let cameraMatrix = m4.lookAt([0, 0, 0], targetPosition, cameraUp);
 

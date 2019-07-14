@@ -84,7 +84,7 @@ export function createSphereVertices(
     indices: indices,
 
     numVertices: numVertices
-  }
+  };
 
 }
 
@@ -116,8 +116,7 @@ export function initShaderProgram(gl, vsSource, fsSource) {
   // If creating the shader program failed, alert
 
   if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-    console.error('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
-    return null;
+    throw Error('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
   }
 
   return shaderProgram;
@@ -141,9 +140,8 @@ function loadShader(gl, type, source) {
   // See if it compiled successfully
 
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    console.error('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
-    return null;
+    throw Error('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
   }
 
   return shader;

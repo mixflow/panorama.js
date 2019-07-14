@@ -1037,7 +1037,7 @@
     dst[14] = translation[2];
     dst[15] = 1;
 
-	  return dst;
+    return dst;
   }
 
   function quatFromRotationMatrix(m, dst) {
@@ -1084,9 +1084,9 @@
   }
   
   function decompose(mat, translation, quaternion, scale) {
-    const sx = m4.length(mat.slice(0, 3));
-    const sy = m4.length(mat.slice(4, 7));
-    const sz = m4.length(mat.slice(8, 11));
+    let sx = length(mat.slice(0, 3));
+    const sy = length(mat.slice(4, 7));
+    const sz = length(mat.slice(8, 11));
 
     // if dematrmine is negative, we need to invert one scale
     const det = determinate(mat);
@@ -1099,7 +1099,7 @@
     translation[2] = mat[14];
 
     // scale the rotation part
-    const matrix = m4.copy(mat);
+    const matrix = copy(mat);
 
     const invSX = 1 / sx;
     const invSY = 1 / sy;
