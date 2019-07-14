@@ -1,6 +1,7 @@
 "use strict";
 
 import { mat4 } from './utils/gl-matrix';
+import m4  from './utils/m4';
 import { initShaderProgram, createSphereVertices } from './webgl-helper';
 
 /**
@@ -35,7 +36,7 @@ export default function panorama(setting) {
     });
   }
 
-  // gl.enable(gl.CULL_FACE); // only draw the front face which the vertices is drawn clockwise.
+  gl.enable(gl.CULL_FACE); // only draw the front face which the vertices is drawn clockwise.
   // Set clear color to black, fully opaque
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   // Clear the color buffer with specified clear color
@@ -125,6 +126,8 @@ export default function panorama(setting) {
   }
 
   let squareRotation = 0.0;
+  let targetPosition = latlonToVertex(Math.PI / 2, 0); // camera target position
+  console.log(targetPosition);
   function drawScene(gl, programInfo, buffers) {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
     gl.clearDepth(1.0);                 // Clear everything
@@ -159,15 +162,17 @@ export default function panorama(setting) {
     // Camera matrix
 
 
-    const cameraMatrix = mat4.create();
-    const targetPosition = [0, 0, -1];
+    
+    
     const cameraUp = [0, 1, 0];
-    mat4.lookAt(cameraMatrix, [0,0,0], targetPosition, cameraUp);
+    let cameraMatrix = m4.lookAt([0, 0, 0], targetPosition, cameraUp);
 
     // Set the drawing position to the "identity" point, which is
     // the center of the scene.
-    const modelViewMatrix =  mat4.create();
-    mat4.invert(modelViewMatrix, cameraMatrix); 
+    let modelViewMatrix = m4.inverse(cameraMatrix); 
+
+    let scale = m4.scaling(-1, 1, 1);
+    modelViewMatrix = m4.multiply(modelViewMatrix, scale);
 
     // Now move the drawing position a bit to where we want to
     // start drawing the square.
@@ -253,6 +258,54 @@ export default function panorama(setting) {
       const offset = 0;
       gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
     }
+  } //[end] drawScene function
+
+  // handle user input and control the camera, mouse and touch
+  let mouseEventHandlers = userControlHandler(updateCamera, false, 0.02);
+  let touchEventHandlers = userControlHandler(updateCamera, true);
+
+
+  // register mouse drag events
+  const mouseEventTypes = ["mousedown", "mousemove", "mouseup"];
+
+  Object.keys(mouseEventHandlers).map((key, idx) => {
+    canvas.addEventListener(mouseEventTypes[idx], mouseEventHandlers[key], false);
+  });
+  
+  // register touch drag events
+  const touchEventTypes = ["touchstart", "touchmove", "touchend"];
+
+  Object.keys(touchEventHandlers).map((key, idx) => {
+    canvas.addEventListener(touchEventTypes[idx], touchEventHandlers[key], false);
+  });
+
+  /**
+   *  The function to change the camera's target that it looks at, 
+   *  Also the callback function that is passed in the drag and move event.
+   * 
+   * @param {number} deltaX the current latitude which camera targets
+   * @param {number} deltaY  the current longitude which camera targets
+   */
+  function updateCamera(deltaX, deltaY) {
+    // TODO deltaX Y to lon lat in radius
+    const radius = 2;
+    let lon = deltaX;
+    let lat = deltaY+ Math.PI / 2;
+    
+    // let latitude = deltaY ;
+    // let longitude = deltaX ;
+    // console.table(latitude, longitude);
+    // lock latitude range, not pass two poles 
+    const maxLat = Math.PI * (1 - 0.1), minLat = Math.PI * (0 + 0.1);
+    if (lat > maxLat) {
+      lat = maxLat;
+    } else if (lat < minLat) {
+      lat = minLat;
+    }
+    targetPosition = latlonToVertex(lat, lon);
+    console.table([lon,lat, targetPosition.join(',')], ["longitude", "latitude", "xyz"]);
+
+    needToRedraw = true; // redraw the scene
   }
 
   /**
