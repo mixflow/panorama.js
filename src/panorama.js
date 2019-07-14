@@ -337,6 +337,10 @@ export default function panorama(setting) {
   return {container};
 } // [end] function panorama
 
+// compute the radian of the degree. 90deg -> PI/2; 180deg -> PI; 45deg-> PI/4;
+const degreeToRadian = (deg) => (deg / 180 * Math.PI);
+const radianToDegree = (radian) => (radian / Math.PI * 180);
+
 /**
  * Transform the latitude and longitude to the correspond vertex in [x,y,z]. (the target point in the sphere whose radius is 1)
  * 
