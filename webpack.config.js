@@ -13,6 +13,24 @@ module.exports = {
     library: "panorama",
     libraryTarget: "umd",
     libraryExport: 'default', // make library is the default export directly.
-  }
+  },
 
-}
+  module:{
+    rules: [
+      {
+        test: /\.js$/,
+        enforce: 'pre',
+        exclude: /(node_modules|bower_components|\.spec\.js)/,
+        use: [
+          {
+            loader: 'webpack-strip-block',
+            options: {
+              start: 'DEV-START',
+              end: 'DEV-END'
+            }
+          }
+        ]
+      }
+    ]
+  }
+};

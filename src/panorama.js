@@ -17,7 +17,7 @@ import { initShaderProgram, createSphereVertices } from './webgl-helper';
  *  positive numbers(0 to 90) are the degrees that looks up, 90 is the north pole(the top);
  *  negative numbers(-90 to 0) are the degrees that looks down, -90 is the south pole(the bottom);
  */
-export default function panorama(setting) {
+function panorama(setting) {
   
   // const CLAZZ = 'panorama'; // css class name. [NOT USED YET]
 
@@ -427,8 +427,6 @@ const userControlHandler = function (draggingCallback, endDragCallback, isTouch,
   function startHandler(event){
     event.preventDefault();
 
-    console.log('down event');
-
     isUserDragging = true;
     
     let {x, y} = getXY(event);
@@ -504,7 +502,6 @@ function loadTexture(gl, url, successCallback){
        // Yes, it's a power of 2. Generate mips.
       gl.generateMipmap(gl.TEXTURE_2D);
       // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-      console.log("mipmap texture");
     } else {
       // No, it's not a power of 2. Turn off mips and set
       // wrapping to clamp to edge
@@ -581,3 +578,10 @@ function curry(method){
     return method.apply(null, startArgs.concat(restArgs)); // call actual function
   }
 }
+
+/* DEV-START */
+const __testonly__ = {degreeToRadian, radianToDegree, curry};
+export {__testonly__};
+/* DEV-END */
+
+export default panorama;
