@@ -4,14 +4,19 @@
   "description": "The Panorama Viewer, pure JS WebGL project.",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "watch": "webpack --watch",
     "build": "webpack src/panorama.js --output dist/panorama.js"
   },
   "author": "MixFlow",
   "license": "MIT",
   "devDependencies": {
+    "@babel/cli": "^7.5.0",
+    "@babel/core": "^7.5.4",
+    "@babel/preset-env": "^7.5.4",
+    "babel-jest": "^24.8.0",
     "eslint": "^5.3.0",
+    "jest": "^24.8.0",
     "webpack": "^4.33.0",
     "webpack-cli": "^3.3.4",
     "webpack-strip-block": "^0.2.0"
