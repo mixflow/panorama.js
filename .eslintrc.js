@@ -3,7 +3,8 @@ module.exports = {
         "browser": true,
         "es6": true,
         "amd": true,
-        "node": true
+        "node": true,
+        "jest": true,
     },
     "extends": ["eslint:recommended"],
     "globals": {
