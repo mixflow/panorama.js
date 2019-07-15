@@ -34,12 +34,12 @@
  *
  * @module webgl-3d-math
  */
-(function(root, factory) {  
-  if (typeof define === 'function' && define.amd) { // eslint-disable-line
+(function(root, factory) {
+  if(typeof exports === 'object' && typeof module === 'object'){
+		module.exports = factory();
+  }else if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
     define([], factory);
-  } else if(typeof exports === 'object'){
-    exports["panorama"] = factory(); // eslint-disable-line
   } else {
     // Browser globals
     root.m4 = factory();
