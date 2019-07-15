@@ -11,6 +11,7 @@
   "author": "MixFlow",
   "license": "MIT",
   "devDependencies": {
+    "eslint": "^5.3.0",
     "webpack": "^4.33.0",
     "webpack-cli": "^3.3.4"
   }
