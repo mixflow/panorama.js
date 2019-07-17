@@ -24,6 +24,7 @@ function panorama(setting) {
   setting = handleSetting(setting);
 
   const {container, url, fov, cameraDegree} = setting;
+  const {radius, numVerticalSegments, numHorizonalSegements} = setting.sphere;
 
   const canvas = document.createElement("canvas");
   canvas.width = container.clientWidth;
@@ -91,9 +92,7 @@ function panorama(setting) {
   };
 
   // create one sphere vertices
-  let sphereSegements = [32, 16];
-  const radius = 15;
-  const sphereVertices = createSphereVertices(radius, sphereSegements[0], sphereSegements[1]);
+  const sphereVertices = createSphereVertices(radius, numVerticalSegments, numHorizonalSegements);
   
   const gl_loadTexture = curry(loadTexture, gl); // method, first argument
   const texture = gl_loadTexture(url, ()=>{needToRedraw = true;});
@@ -536,23 +535,42 @@ const defaultSetting = {
   // the field of view
   fov: 90,
   // the inital degree of the camerea view, default is [0,0] which means to look front on the horizon
-  cameraDegree: [0, 0]
+  cameraDegree: [0, 0],
+
+  sphere: {
+    radius: 30,
+    numVerticalSegments: 16, // the number of the vertical segments. Like Earth's meridians,the line going pole to pole.
+    numHorizonalSegements: 8 // the number of the horizonal segments. Like Earth's parallels.
+  }
 };
+
+/**
+ * Fill the setting with default ones, except the exclude ones match the `excludeKeys`.
+ * 
+ * @param {Object} setting  The object literal that is target setting, whose missing entries will be filled with default ones.
+ * @param {Object} defaultSetting  The object literal  contains default setting entries
+ * @param {Set} [excludeKeys=Set(0)] Will NOT copy the entry that is in the exclude keys, default is empty set that there is no exclude keys
+ */
+function copyMissingValues(setting, defaultSetting, excludeKeys=new Set()) {
+  // fill the missing entry with default
+  for (let key in defaultSetting) {
+    if (!excludeKeys.has(key) && !(key in setting)){
+      setting[key] = defaultSetting[key];
+    }
+  }
+}
 
 function handleSetting(setting){
   setting = setting || {};
-  
+  const objectSettingKeys = ["sphere"]; // the setting entry value is object.
+
   // thes option must be contained 
   if (!setting.url || typeof setting.url !== "string") {
     throw Error("Missing `url` in `setting` or The type of `url` isn't correct: the image url must be passed in `setting`, and it should be string.")
   }
 
-  // fill the missing setting with default
-  for (let key in defaultSetting) {
-    if (!(key in setting)){
-      setting[key] = defaultSetting[key];
-    }
-  }
+  copyMissingValues(setting, defaultSetting);
+  objectSettingKeys.map( key => copyMissingValues(setting[key], defaultSetting[key]) );
 
   // container can be either string or DOMElement
   if (typeof setting.container === "string") {

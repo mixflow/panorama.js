@@ -5,6 +5,28 @@ const {defaultSetting, handleSetting, degreeToRadian, radianToDegree} = api;
 // the minimum size of entries in setting that the user can pass
 const newMinSetting = () => ({url: "fake url"});
 
+describe("If user has partial sphere settings(only radius is set), it would fill missing sphere settings with default ones", () => {
+  
+  const radius = 15;
+  let setting = newMinSetting();
+  // only set radius
+  setting.sphere = {radius: radius};
+  
+  let sphereSetting = handleSetting(setting).sphere;
+
+  test("the radius should be user's value", ()=>{
+    expect(sphereSetting.radius).toBe(radius); // check whether radius is user's
+  });
+  // check whether other sphere settings are filled.
+  const defaultKeys = Object.keys(sphereSetting).filter(key => key !== "radius"); // exclude the radius entry
+  test("the parts that are filled with defaults should NOT be empty", ()=>{
+    expect(defaultKeys.length).toBeGreaterThan(0); // not empty 
+  });
+  test("the missing sphere setting are same as default values", ()=>{
+    defaultKeys.map(key => expect(sphereSetting[key]).toBe(defaultSetting.sphere[key]));
+  });
+});
+
 test("get DOMelement when user setting's container is string", () => {
   const target = document.createElement("div");
   target.id = "Neo";
