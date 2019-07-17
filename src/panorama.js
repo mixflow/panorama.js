@@ -173,26 +173,14 @@ function panorama(setting) {
     const cameraUp = [0, 1, 0];
     let cameraMatrix = m4.lookAt([0, 0, 0], targetPosition, cameraUp);
 
+    // cameraMatrix = m4.translate(cameraMatrix, 0, 0, -3);
+
     // Set the drawing position to the "identity" point, which is
     // the center of the scene.
     let modelViewMatrix = m4.inverse(cameraMatrix); 
 
     let scale = m4.scaling(-1, 1, 1);
     modelViewMatrix = m4.multiply(modelViewMatrix, scale);
-
-    // Now move the drawing position a bit to where we want to
-    // start drawing the square.
-
-    // mat4.translate(modelViewMatrix,     // destination matrix
-    //                modelViewMatrix,     // matrix to translate
-    //                [-0.0, 0.0, -6.0]);  // amount to translate
-    
-    // rotate the square
-    // mat4.rotate(modelViewMatrix,  // destination matrix
-    //           modelViewMatrix,  // matrix to rotate
-    //           squareRotation * 0.2,   // amount to rotate in radians
-    //           [0, 1, 0]);       // axis to rotate around
-            
 
     // Tell WebGL how to pull out the positions from the position
     // buffer into the vertexPosition attribute.
@@ -566,7 +554,7 @@ function handleSetting(setting){
 
   // thes option must be contained 
   if (!setting.url || typeof setting.url !== "string") {
-    throw Error("Missing `url` in `setting` or The type of `url` isn't correct: the image url must be passed in `setting`, and it should be string.")
+    throw Error("Missing `url` in `setting` or The type of `url` isn't correct: the image url must be passed in `setting`, and it should be string.");
   }
 
   copyMissingValues(setting, defaultSetting);
@@ -594,7 +582,7 @@ function curry(method){
   return function(){
     const restArgs = slice.apply(arguments);
     return method.apply(null, startArgs.concat(restArgs)); // call actual function
-  }
+  };
 }
 
 /* DEV-START */
