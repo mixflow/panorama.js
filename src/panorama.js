@@ -533,7 +533,7 @@ const defaultSetting = {
   url: undefined,
   
   // the field of view
-  fov: 90,
+  fov: 75,
   // the inital degree of the camerea view, default is [0,0] which means to look front on the horizon
   cameraDegree: [0, 0],
 
