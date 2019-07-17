@@ -527,21 +527,21 @@ function loadTexture(gl, url, successCallback){
   panorama helper function
  */
 
+const defaultSetting = {
+  // the DOMelement(or the CSS seletor string that refers the DOMElement) container that contains this panorama.js component
+  container: document.body,
+  // the image url of the panorama
+  url: undefined,
+  
+  // the field of view
+  fov: 90,
+  // the inital degree of the camerea view, default is [0,0] which means to look front on the horizon
+  cameraDegree: [0, 0]
+};
+
 function handleSetting(setting){
   setting = setting || {};
   
-  const defaultSetting = {
-    // the DOMelement(or the CSS seletor string that refers the DOMElement) container that contains this panorama.js component
-    container: document.body,
-    // the image url of the panorama
-    url: undefined,
-    
-    // the field of view
-    fov: 90,
-    // the inital degree of the camerea view, default is [0,0] which means to look front on the horizon
-    cameraDegree: [0, 0]
-  };
-
   // thes option must be contained 
   if (!setting.url || typeof setting.url !== "string") {
     throw Error("Missing `url` in `setting` or The type of `url` isn't correct: the image url must be passed in `setting`, and it should be string.")
@@ -580,7 +580,7 @@ function curry(method){
 }
 
 /* DEV-START */
-const __testonly__ = {degreeToRadian, radianToDegree, curry};
+const __testonly__ = {defaultSetting, handleSetting, degreeToRadian, radianToDegree, curry};
 export {__testonly__};
 /* DEV-END */
 
