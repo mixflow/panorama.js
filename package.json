@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "test": "jest",
+    "watch-test": "jest --watchAll",
     "watch": "webpack --watch",
     "build": "webpack src/panorama.js --output dist/panorama.js"
   },
