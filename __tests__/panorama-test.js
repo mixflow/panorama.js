@@ -1,6 +1,55 @@
 import panorama, {__testonly__ as api} from '../src/panorama';
 
-const {defaultSetting, handleSetting, degreeToRadian, radianToDegree} = api;
+const {loadImage, defaultSetting, handleSetting, degreeToRadian, radianToDegree} = api;
+
+
+describe("load image", ()=>{
+  beforeEach(() => { // setup: mock the fetch. beforeEach can handle asynchoronial code
+    window.fetch = jest.fn().mockImplementation((url) => {
+      return Promise.resolve({
+        ok: true, 
+        blob: () => Promise.resolve(new Blob(["mock image blob"])),
+
+        headers: { get: (header) => ({"Content-Length": 20}[header]) },
+        body: { getReader: () => ({
+          read: jest.fn()
+            .mockResolvedValue({done: true, value: {length: 10}})
+            .mockResolvedValueOnce({done: false, value: {length: 10}})
+            .mockName("mockedReadFunctionInReadStream")
+        })},
+      });
+    });
+
+    // this createObjectURL method isn't in jest-dom. Mock it in jest
+    window.URL.createObjectURL = jest.fn(() => "mockObjectUrl");
+  });
+
+  test("percentage when loading", done=> {
+    let times = 0;
+    function loadingCallback (current, total) {
+      times += 1; 
+      if (times == 1) {
+        expect(current/total).toBe(0.5);
+      }else if (times == 2) {
+        expect(current).toBe(total);
+        done();
+      }
+    }
+
+    loadImage({url: "mockimageurl/image.png", loadingCallback});
+  });
+
+  test("pass image url and load the image",  done=>{
+    // done is used for callback(async) function test.
+    function loadedCallback (image) {
+      expect(image instanceof HTMLImageElement).toBeTruthy();
+      expect(image.src).toMatch(/mockObjectUrl/);
+      done();
+    }
+    
+    loadImage({url: "mockimageurl/image.png", loadedCallback});
+  });
+});
 
 // the minimum size of entries in setting that the user can pass
 const newMinSetting = () => ({url: "fake url"});

@@ -510,6 +510,36 @@ function loadTexture(gl, url, successCallback){
   return texture;
 }
 
+function loadImage({url, image=new Image(), loadedCallback, loadingCallback}) {
+  let totalSize = undefined;
+  let receivedSize = 0;
+  fetch(url)
+    .then(response => {
+      if (!totalSize) { totalSize = response.headers.get("Content-Length"); }
+
+      const reader = response.body.getReader();
+      reader.read().then(function process({done, value}) {
+        receivedSize += value.length; 
+        loadingCallback(receivedSize, totalSize);
+
+        if (done) return;
+
+        // continue read the readStream
+        reader.read().then(process);
+      })
+
+      return response.blob(); // blob promise
+    })
+    .then(blobData => {
+      image.src = URL.createObjectURL(blobData);
+      
+      if (loadedCallback) {
+        loadedCallback(image);
+      }
+    })
+    .catch( err => {throw err;});
+}
+
 /*
   panorama helper function
  */
@@ -586,7 +616,7 @@ function curry(method){
 }
 
 /* DEV-START */
-const __testonly__ = {defaultSetting, handleSetting, degreeToRadian, radianToDegree, curry};
+const __testonly__ = {loadImage, defaultSetting, handleSetting, degreeToRadian, radianToDegree, curry};
 export {__testonly__};
 /* DEV-END */
 
