@@ -451,10 +451,14 @@ const userControlHandler = function (draggingCallback, endDragCallback, isTouch,
 
 /**
  * 
- * @param {WebGLRenderingContext} gl 
- * @param {string} url image url
+ * @param {WebGLRenderingContext} gl The context of webgl
+ * @param {string} url image url that is used as texture 
+ * @param {function} textureLoadedCallback Optional, the function is called with loaded texture argument 
+ *  when texture is already loaded. Usually contains the method that redraw webgl scene to show the texture.
+ * @return {WebGLTexture} the webgl texture. Be careful, the texture is loaded asynchronously(load image asynchronously), 
+ *  it would be placeholder(single color) at the beginning. So use the callback function to handle the loaded texture.
  */
-function loadTexture(gl, url, successCallback){
+function loadTexture(gl, url, textureLoadedCallback){
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
@@ -472,12 +476,13 @@ function loadTexture(gl, url, successCallback){
                 width, height, border, srcFormat, srcType,
                 pixel);
 
-
-  // TODO seperate/extract the image part from WebGL texture part.
-  const image = new Image();
-
-  image.crossOrigin = "anonymous"; // solve CROS problem
-  image.onload = function() {
+  /**
+   * The callback function would be called when complete loading image.
+   * Set the panorama image as the texture.
+   * @param {HTMLImageElement} image  the image element that is used as texture
+   */
+  function bindImageTextureCallback (image) {
+    
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
                   srcFormat, srcType, image);
@@ -486,58 +491,70 @@ function loadTexture(gl, url, successCallback){
     // vs non power of 2 images so check if the image is a
     // power of 2 in both dimensions.
     if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
-       // Yes, it's a power of 2. Generate mips.
+      // Yes, it's a power of 2. Generate mips.
       gl.generateMipmap(gl.TEXTURE_2D);
-      // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     } else {
       // No, it's not a power of 2. Turn off mips and set
       // wrapping to clamp to edge
-      
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
       // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     }
+  
+    // callback after image loaded.
+    if (textureLoadedCallback) {textureLoadedCallback(texture);}
+    
+  } // [end] bindImageTextureCallback
 
-    // callback after loaded.
-    if (successCallback) {
-      successCallback();
-    }
-  };
-  image.src = url;
+  function updateProgressBar (loaded, total){
+
+  } // [end] updateProgressBar
+
+  const image = document.createElement("img");
+  loadImage({url:url, image: image, loadedCallback: bindImageTextureCallback, loadingCallback: updateProgressBar});
 
   return texture;
 }
 
-function loadImage({url, image=new Image(), loadedCallback, loadingCallback}) {
-  let totalSize = undefined;
-  let receivedSize = 0;
-  fetch(url)
-    .then(response => {
-      if (!totalSize) { totalSize = response.headers.get("Content-Length"); }
+function loadImage({url, image = new Image(), loadedCallback, loadingCallback}) {
 
-      const reader = response.body.getReader();
-      reader.read().then(function process({done, value}) {
-        receivedSize += value.length; 
-        loadingCallback(receivedSize, totalSize);
+  const onProgressHandler = loadingCallback ?
+    (event) => loadingCallback(event.loaded, event.total) :
+    undefined;
+  
+  // [Important] image.src is asynchronous operation, set onload to handle after the image is loaded
+  image.onload = function() { 
+    if (loadedCallback) {loadedCallback(image);}
+  };
+    
+  progressFetchBlob(url, {method: "get"}, onProgressHandler)
+  .then(responseBlob => {
+    const objectUrl = URL.createObjectURL(responseBlob);
+    image.src = objectUrl;
+  })
+  .catch( err => {throw err;});
+}
 
-        if (done) return;
+function progressFetchBlob(url, opts={}, onProgressHandler) {
+  return new Promise((resolve, reject) => {
+    let xhr = new XMLHttpRequest();
+    
+    xhr.responseType = "blob";
+    xhr.open(opts.method || "get", url);
+    
+    if (opts.headers) {
+      Object.keys(opts.headers).map( key => xhr.setRequestHeader(key, opts.headers[key]) );
+    }
+    if (onProgressHandler) {
+      xhr.onprogress = onProgressHandler; // passed event
+    }
+    xhr.onload = (event) => resolve(event.target.response);
+    xhr.onerror = reject;
 
-        // continue read the readStream
-        reader.read().then(process);
-      })
-
-      return response.blob(); // blob promise
-    })
-    .then(blobData => {
-      image.src = URL.createObjectURL(blobData);
-      
-      if (loadedCallback) {
-        loadedCallback(image);
-      }
-    })
-    .catch( err => {throw err;});
+    xhr.send(opts.body);
+  });
 }
 
 /*
@@ -616,7 +633,7 @@ function curry(method){
 }
 
 /* DEV-START */
-const __testonly__ = {loadImage, defaultSetting, handleSetting, degreeToRadian, radianToDegree, curry};
+const __testonly__ = {loadImage, progressFetchBlob, defaultSetting, handleSetting, degreeToRadian, radianToDegree, curry};
 export {__testonly__};
 /* DEV-END */
 

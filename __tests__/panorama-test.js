@@ -1,30 +1,87 @@
 import panorama, {__testonly__ as api} from '../src/panorama';
 
-const {loadImage, defaultSetting, handleSetting, degreeToRadian, radianToDegree} = api;
+const {loadImage, progressFetchBlob, defaultSetting, handleSetting, degreeToRadian, radianToDegree} = api;
 
 
 describe("load image", ()=>{
   beforeEach(() => { // setup: mock the fetch. beforeEach can handle asynchoronial code
-    window.fetch = jest.fn().mockImplementation((url) => {
-      return Promise.resolve({
-        ok: true, 
-        blob: () => Promise.resolve(new Blob(["mock image blob"])),
+    // window.fetch = jest.fn().mockImplementation((url) => {
+    //   return Promise.resolve({
+    //     ok: true, 
+    //     blob: () => Promise.resolve(new Blob(["mock image blob"])),
 
-        headers: { get: (header) => ({"Content-Length": 20}[header]) },
-        body: { getReader: () => ({
-          read: jest.fn()
-            .mockResolvedValue({done: true, value: {length: 10}})
-            .mockResolvedValueOnce({done: false, value: {length: 10}})
-            .mockName("mockedReadFunctionInReadStream")
-        })},
-      });
-    });
+    //     headers: { get: (header) => ({"Content-Length": 20}[header]) },
+    //     body: { getReader: () => ({
+    //       read: jest.fn()
+    //         .mockResolvedValue({done: true, value: {length: 10}})
+    //         .mockResolvedValueOnce({done: false, value: {length: 10}})
+    //         .mockName("mockedReadFunctionOfReader")
+    //     })},
+    //   });
+    // });
+
+    const mockXHR = {
+        open: jest.fn(),
+        _onprogressHandler: jest.fn()
+          .mockImplementation( cb => cb({total: 20, loaded: 20}) ) // default or final
+          .mockImplementationOnce( cb => cb({total: 20, loaded: 10}) )
+          .mockName("mockedOnProgressEvent"),
+        _onloadHandler: jest.fn( function(cb) {
+          cb( {target: this.responseType === "blob"? "response:mockedBlob": "response:mockedText"} );
+        }),
+        send: function() {
+          if(this.onprogress){
+            this._onprogressHandler(this.onprogress);
+            this._onprogressHandler(this.onprogress);
+          }
+
+          this._onloadHandler(this.onload);
+        },
+        responseType: "text", // mock text and blob
+        
+        readyState: 4,
+        response: "",
+    };
+    window.XMLHttpRequest = jest.fn( ()=> Object.assign({},mockXHR) );
 
     // this createObjectURL method isn't in jest-dom. Mock it in jest
-    window.URL.createObjectURL = jest.fn(() => "mockObjectUrl");
+    window.URL.createObjectURL = jest.fn((blob) => `mockObjectUrl, blob is ${blob}`);
+
+    let _src = "";
+    Object.defineProperty(global.Image.prototype, 'src', {
+      // Define the property setter
+      set(input) {
+        _src = input;
+        if (!input) { 
+          // Call with setTimeout to simulate async loading
+          setTimeout(() => this.onerror(new Error('mocked error')));
+        } else {
+          setTimeout(() => this.onload());
+        }
+      },
+      get(){
+        return _src;
+      }
+    });
   });
 
-  test("percentage when loading", done=> {
+  test("custom fetch with progress info", done => {
+    let times = 0;
+    function onProgressHandler (event) {
+      const {loaded, total} = event;
+      times += 1;
+      if (times == 1) {
+        expect(loaded/total).toBe(0.5);
+      } else if (times == 2) {
+        expect(loaded).toBe(total);
+      }
+
+      done();
+    }
+    progressFetchBlob("mockimageurl/image.png", {method:"get"}, onProgressHandler);
+  });
+
+  test("progress percentage when loading", done=> {
     let times = 0;
     function loadingCallback (current, total) {
       times += 1; 
