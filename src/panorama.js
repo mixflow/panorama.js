@@ -29,7 +29,11 @@ function panorama(setting) {
   const canvas = document.createElement("canvas");
   canvas.width = container.clientWidth;
   canvas.height = container.clientHeight;
-  container.appendChild(canvas);
+
+  const wrapper = document.createElement("div");
+  container.appendChild(wrapper);
+
+  wrapper.appendChild(canvas);
 
   const gl = canvas.getContext("webgl"); // gl: WebGLRenderingContext
 
