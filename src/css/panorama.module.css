@@ -1,0 +1,18 @@
+.panoramaWrapper {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.panoramaOverlay {
+    /* overlay on the parent(wrapper), one's position is relative and 
+    the other is absolute. */
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    
+    top: 0;
+    left: 0;
+
+    /* background-color: #1EB9FF; */
+}

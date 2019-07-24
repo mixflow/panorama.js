@@ -3,6 +3,8 @@
 import m4  from './utils/m4';
 import { initShaderProgram, createSphereVertices } from './webgl-helper';
 
+import {panoramaWrapper, panoramaOverlay} from "./css/panorama.module.css";
+
 /**
  * Panorama.js. create panorama
  *
@@ -31,9 +33,16 @@ function panorama(setting) {
   canvas.height = container.clientHeight;
 
   const wrapper = document.createElement("div");
-  container.appendChild(wrapper);
+  wrapper.classList.add(panoramaWrapper);
 
+  // user container > wrapper > canvas
+  container.appendChild(wrapper);
   wrapper.appendChild(canvas);
+
+  // overlay
+  const overlay = document.createElement("div");
+  overlay.className = panoramaOverlay;
+  wrapper.appendChild(overlay);
 
   const gl = canvas.getContext("webgl"); // gl: WebGLRenderingContext
 
