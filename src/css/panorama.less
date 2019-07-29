@@ -1,0 +1,55 @@
+@base-color: #FFF;
+
+.centering {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+}
+
+.wrapper {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.overlay {
+  /* overlay on the parent(wrapper), one's position is relative and
+  the other is absolute. */
+  position: absolute;
+  height: 100%;
+  width: 100%;
+
+  top: 0;
+  left: 0;
+
+  /* background-color: #1EB9FF; */
+}
+
+.loadingWrapper {
+  composes: centering;
+
+  width: 35%;
+  height: 20px;
+
+  border: 1px solid @base-color;
+
+}
+
+.progressBar {
+  background-color: @base-color;
+
+  width: 0; // init 0 length
+  height: 100%;
+}
+
+.progressMessage {
+  color: @base-color;
+  float: left;
+}
+
+.percentageNum {
+  color: @base-color;
+  float: right;
+}

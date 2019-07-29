@@ -3,7 +3,7 @@
 import m4  from './utils/m4';
 import { initShaderProgram, createSphereVertices } from './webgl-helper';
 
-import {panoramaWrapper, panoramaOverlay} from "./css/panorama.module.css";
+import clazz from "./css/panorama.less";
 
 /**
  * Panorama.js. create panorama
@@ -33,7 +33,7 @@ function panorama(setting) {
   canvas.height = container.clientHeight;
 
   const wrapper = document.createElement("div");
-  wrapper.classList.add(panoramaWrapper);
+  wrapper.classList.add(clazz.wrapper);
 
   // user container > wrapper > canvas
   container.appendChild(wrapper);
@@ -41,7 +41,7 @@ function panorama(setting) {
 
   // overlay
   const overlay = document.createElement("div");
-  overlay.className = panoramaOverlay;
+  overlay.className = clazz.overlay;
   wrapper.appendChild(overlay);
 
   const gl = canvas.getContext("webgl"); // gl: WebGLRenderingContext
@@ -106,9 +106,19 @@ function panorama(setting) {
 
   // create one sphere vertices
   const sphereVertices = createSphereVertices(radius, numVerticalSegments, numHorizonalSegements);
-  
+
+  // create one progress helper function to control loading info.
+  const loadingProgressHelper = loadingProgressFactory(overlay, "loading panorama...");
+
   const gl_loadTexture = curry(loadTexture, gl); // method, first argument
-  const texture = gl_loadTexture(url, ()=>{needToRedraw = true;});
+  const texture = gl_loadTexture(
+    url,
+    ()=>{ // callback after finishing to load the texture
+      loadingProgressHelper.hide(); // hide progress info
+      needToRedraw = true;
+    },
+    loadingProgressHelper.createOrUpdate // callback while loading
+  );
 
   const buffers = initBuffers(gl);
   function initBuffers(gl) {
@@ -462,6 +472,73 @@ const userControlHandler = function (draggingCallback, endDragCallback, isTouch,
 }; // [end] return actual function
 
 
+const loadingProgressFactory = function(parent, text=""){
+  let loadingWrapper = undefined; // store DOMElement later
+  let progressBar = undefined;
+  let message = undefined;
+  let percentageNumEl = undefined;
+
+  // the actual function
+  function createOrUpdate(loaded, total) {
+    if (typeof loadingWrapper === "undefined") {
+      // create DOMELement of the progress bar
+      loadingWrapper = document.createElement("div");
+      loadingWrapper.className = clazz.loadingWrapper;
+
+      progressBar = document.createElement("div");
+      loadingWrapper.appendChild(progressBar);
+      progressBar.className = clazz.progressBar;
+
+      loadingWrapper.appendChild(progressBar);
+      parent.appendChild(loadingWrapper);
+    }
+
+    if(text && typeof message === "undefined"){
+      createMessage();
+    }
+
+    // update progress bar.
+    const ratio = (loaded / total).toPrecision(4);
+    if (!Number.isNaN(ratio)) {
+      // actually have percentage number
+      const percentageNum = `${ratio * 100}%`;
+      progressBar.style.width = percentageNum;
+
+      // show percentage number text
+      createOrUpdatePercentageNumber(percentageNum);
+    }
+  }
+
+  function createOrUpdatePercentageNumber(percentageNum) {
+    if (typeof percentageNumEl === "undefined") {
+      // if not exists, create
+      percentageNumEl = document.createElement("div");
+      percentageNumEl.className = clazz.percentageNum;
+
+      loadingWrapper.appendChild(percentageNumEl);
+    }
+    percentageNumEl.innerText = percentageNum;
+  }
+
+  function createMessage() {
+    message = document.createElement("div");
+    message.className = clazz.progressMessage;
+    message.innerText = text;
+
+    loadingWrapper.appendChild(message);
+  }
+
+  function hide(){
+    loadingWrapper.style.display = "none";
+  }
+
+  function show(){
+    loadingWrapper.style.display = "block";
+  }
+
+  return {createOrUpdate, hide, show};
+};
+
 /**
  *
  * @param {WebGLRenderingContext} gl The context of webgl
@@ -518,15 +595,11 @@ function loadTexture(gl, url, textureLoadedCallback, loadingCallback){
 
     // callback after image loaded.
     if (textureLoadedCallback) {textureLoadedCallback(texture);}
-    
+
   } // [end] bindImageTextureCallback
 
-  function updateProgressBar (loaded, total){
-
-  } // [end] updateProgressBar
-
   const image = document.createElement("img");
-  loadImage({url:url, image: image, loadedCallback: bindImageTextureCallback, loadingCallback: updateProgressBar});
+  loadImage({url:url, image: image, loadedCallback: bindImageTextureCallback, loadingCallback: loadingCallback});
 
   return texture;
 }
