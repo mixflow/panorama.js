@@ -14,13 +14,13 @@ import {panoramaWrapper, panoramaOverlay} from "./css/panorama.module.css";
  * @param {number} [setting.fov=90] the Field Of View in degrees, the camera view angle scope.
  * @param {number array} [setting.cameraDegree=[0,0]] two numbers represent the horizonal and vertical degrees of camera,
  *  default is [0,0] which means the default start point of the panorama image.
- *  the first number ranges from 0 to 360 which is horizonal degree which is the direction that camera looks on the horizon. 
+ *  the first number ranges from 0 to 360 which is horizonal degree which is the direction that camera looks on the horizon.
  *  the second number ranges from -90 to 90 (totally 180 degrees)  which is vertical degrees or the Pitch angle when look up or look down,
  *  positive numbers(0 to 90) are the degrees that looks up, 90 is the north pole(the top);
  *  negative numbers(-90 to 0) are the degrees that looks down, -90 is the south pole(the bottom);
  */
 function panorama(setting) {
-  
+
   // const CLAZZ = 'panorama'; // css class name. [NOT USED YET]
 
   setting = handleSetting(setting);
@@ -50,7 +50,7 @@ function panorama(setting) {
   if (gl === null) {
     // TODO warnig the msg that webgl isn't avaiable.
     throw Error({
-      type: "Not support WebGL", 
+      type: "Not support WebGL",
       msg: "WebGL isn't support. the panorama will not work.",
     });
   }
@@ -112,18 +112,18 @@ function panorama(setting) {
 
   const buffers = initBuffers(gl);
   function initBuffers(gl) {
-    
+
     // position buffer parts
     const positions = sphereVertices.poistions.flat();
 
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), 
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions),
       gl.STATIC_DRAW);
-    
+
     // texture parts
     const textureCoords = sphereVertices.textureCoordinates.flat();
-    
+
     const textureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
@@ -133,7 +133,7 @@ function panorama(setting) {
 
     const indexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), 
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices),
       gl.STATIC_DRAW);
 
     return {
@@ -144,15 +144,15 @@ function panorama(setting) {
   }
 
   /**
-   * Carefully! the range of user setting vertical degrees (-90 to 90) is 
-   * the reversed order of the latitude(0 to Math.PI) that develops need, also with the offset of half of PI. 
+   * Carefully! the range of user setting vertical degrees (-90 to 90) is
+   * the reversed order of the latitude(0 to Math.PI) that develops need, also with the offset of half of PI.
    * latitude 0 means the north pole(the top) that is the user setting degree 90.
-   * 
-   * Why make user setting and actual data such different? 
+   *
+   * Why make user setting and actual data such different?
    * Anwser: easy for use. `[0,0]`as startpoint matches the man's intuition.
    */
   let latitude =  -degreeToRadian(cameraDegree[1]) + (Math.PI / 2);
-  let longitude =  degreeToRadian(cameraDegree[0]); // trans to radian directly 
+  let longitude =  degreeToRadian(cameraDegree[0]); // trans to radian directly
   let targetPosition = latlonToVertex(latitude, longitude); // camera target position
 
   function drawScene(gl, programInfo, buffers) {
@@ -190,7 +190,7 @@ function panorama(setting) {
 
     // Set the drawing position to the "identity" point, which is
     // the center of the scene.
-    let modelViewMatrix = m4.inverse(cameraMatrix); 
+    let modelViewMatrix = m4.inverse(cameraMatrix);
 
     let scale = m4.scaling(-1, 1, 1);
     modelViewMatrix = m4.multiply(modelViewMatrix, scale);
@@ -274,25 +274,25 @@ function panorama(setting) {
     let lon;
 
     /**
-     *  The function to change the camera's target that it looks at, 
+     *  The function to change the camera's target that it looks at,
      *  Also the callback function that is passed in the drag and move event.
-     * 
+     *
      * @param {number} deltaX the current latitude which camera targets
      * @param {number} deltaY  the current longitude which camera targets
      */
     function updateCamera(deltaX, deltaY) {
       // update the latlon by adding delta value
-      // Treat the delta value as the movement on the circumference(very close), 
+      // Treat the delta value as the movement on the circumference(very close),
       // and calculate the ratio of the movement over circumference and get the radian
-      // delta longitude = deltaX / circumference * (2*Math.PI), 
+      // delta longitude = deltaX / circumference * (2*Math.PI),
       // becasuse circumference is (2*Math.PI*radius), so the simplify formular is deltaX / radius.
       let deltaLon = deltaX / radius;
       let delatLat = deltaY / radius;
-  
+
       lat = delatLat+latitude;
       lon = deltaLon+longitude;
-      
-      // lock latitude range, not pass two poles 
+
+      // lock latitude range, not pass two poles
       const maxLat = Math.PI * (1 - 0.05);
       const minLat = Math.PI * (0 + 0.05);
       if (lat > maxLat) {
@@ -300,10 +300,10 @@ function panorama(setting) {
       } else if (lat < minLat) {
         lat = minLat;
       }
-  
+
       // compute the lookAt vertice.
       targetPosition = latlonToVertex(lat, lon);
-  
+
       needToRedraw = true; // redraw the scene
     }
 
@@ -327,7 +327,7 @@ function panorama(setting) {
   Object.keys(mouseEventHandlers).map((key, idx) => {
     canvas.addEventListener(mouseEventTypes[idx], mouseEventHandlers[key], false);
   });
-  
+
   // register touch drag events
   const touchEventTypes = ["touchstart", "touchmove", "touchend"];
 
@@ -340,7 +340,7 @@ function panorama(setting) {
    * Check the display size(`canvas.clientWidth` and `canvas.clientHeight`) whether it's changed.
    * Update the canvas render size(`canvas.width` and `canvas.height`) to the current display size.
    * And return `true` when the size is changed, otherwise `false`
-   * 
+   *
    * @return {boolean} true: need resize; false: no need.
    */
   function resize(){
@@ -380,12 +380,12 @@ const radianToDegree = (radian) => (radian / Math.PI * 180);
 
 /**
  * Transform the latitude and longitude to the correspond vertex in [x,y,z]. (the target point in the sphere whose radius is 1)
- * 
+ *
  * @param {number} latitude the radian of latitude, normally from -PI to PI.
  * @param {number} longitude the radian of logitude, normally from 0 to 2*PI.
  */
 function latlonToVertex(latitude, longitude){
-  const theta = longitude; 
+  const theta = longitude;
   const phi = latitude;
 
   const sinTheta = Math.sin(theta), cosTheta = Math.cos(theta);
@@ -399,27 +399,27 @@ function latlonToVertex(latitude, longitude){
 }
 
 /**
- * Generate the three event handler for user's input control when is dragging. 
+ * Generate the three event handler for user's input control when is dragging.
  * `startHandler` is used for the begin of the dragging control, handle `mousedown` event or `touchstart` event.
  * `moveHandler` is used when user is dragging, handle `mousemove` event or `touchmove` event.
  * `endHandler` is used for the end of the dragging control, handle `mouseup` or  `touchend` event.
- * 
- * @param {function} draggingCallback the callback function handle user drag movement when user is dragging. 
+ *
+ * @param {function} draggingCallback the callback function handle user drag movement when user is dragging.
  *  passed two arguments current deltaX and deltaY(user movement in pixel) that is used later to compute the camera `look at` (target position).
  * @param {boolean} [isTouch=false] true if user use touch device to drag and move, false otherwise(like mouse).
  * @param {number} [moveSpeed=1] the multiplier of the user movement speed, default it's 1 that is normal speed and no change.
  */
 const userControlHandler = function (draggingCallback, endDragCallback, isTouch, moveSpeed) {
-  
+
   let startX = 0;
   let startY = 0;
-  let isUserDragging = false; // true during user drags 
+  let isUserDragging = false; // true during user drags
 
   // set default value 1 to moveSpeed
-  if (typeof moveSpeed === "undefined") {moveSpeed = 1;} 
+  if (typeof moveSpeed === "undefined") {moveSpeed = 1;}
 
-  // get clientX and clientY either from mouse(click) or touch.  
-  const getXY = isTouch ? 
+  // get clientX and clientY either from mouse(click) or touch.
+  const getXY = isTouch ?
     (eventTarget) => ({x: eventTarget.changedTouches[0].clientX, y: eventTarget.changedTouches[0].clientY}) :
     (eventTarget) => ({x: eventTarget.clientX, y: eventTarget.clientY});
 
@@ -428,28 +428,28 @@ const userControlHandler = function (draggingCallback, endDragCallback, isTouch,
     event.preventDefault();
 
     isUserDragging = true;
-    
+
     let {x, y} = getXY(event);
     startX = x;
     startY = y;
   }
 
   function moveHandler(event){
-    
+
     if (isUserDragging === true) {
       let {x, y} = getXY(event);
       let deltaX = x - startX;
       let deltaY = y - startY;
-  
+
       deltaX = deltaX * moveSpeed;
       deltaY = deltaY * moveSpeed;
-      
+
       draggingCallback(deltaX, deltaY);
     }
   }
 
   function endHandler(event){
-    isUserDragging = false; // reset 
+    isUserDragging = false; // reset
 
     endDragCallback();
   }
@@ -463,15 +463,15 @@ const userControlHandler = function (draggingCallback, endDragCallback, isTouch,
 
 
 /**
- * 
+ *
  * @param {WebGLRenderingContext} gl The context of webgl
- * @param {string} url image url that is used as texture 
- * @param {function} textureLoadedCallback Optional, the function is called with loaded texture argument 
+ * @param {string} url image url that is used as texture
+ * @param {function} textureLoadedCallback Optional, the function is called with loaded texture argument
  *  when texture is already loaded. Usually contains the method that redraw webgl scene to show the texture.
- * @return {WebGLTexture} the webgl texture. Be careful, the texture is loaded asynchronously(load image asynchronously), 
+ * @return {WebGLTexture} the webgl texture. Be careful, the texture is loaded asynchronously(load image asynchronously),
  *  it would be placeholder(single color) at the beginning. So use the callback function to handle the loaded texture.
  */
-function loadTexture(gl, url, textureLoadedCallback){
+function loadTexture(gl, url, textureLoadedCallback, loadingCallback){
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
@@ -481,7 +481,7 @@ function loadTexture(gl, url, textureLoadedCallback){
   const srcType = gl.UNSIGNED_BYTE;
 
   // grey placeholder color before texture loaded // [0,0,255,128]opaque blue
-  const pixel = new Uint8Array([0, 0, 0, 128]); 
+  const pixel = new Uint8Array([0, 0, 0, 128]);
   const width = 1;
   const height = 1;
   const border = 0;
@@ -495,7 +495,7 @@ function loadTexture(gl, url, textureLoadedCallback){
    * @param {HTMLImageElement} image  the image element that is used as texture
    */
   function bindImageTextureCallback (image) {
-    
+
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
                   srcFormat, srcType, image);
@@ -515,7 +515,7 @@ function loadTexture(gl, url, textureLoadedCallback){
       // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
       // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     }
-  
+
     // callback after image loaded.
     if (textureLoadedCallback) {textureLoadedCallback(texture);}
     
@@ -536,12 +536,12 @@ function loadImage({url, image = new Image(), loadedCallback, loadingCallback}) 
   const onProgressHandler = loadingCallback ?
     (event) => loadingCallback(event.loaded, event.total) :
     undefined;
-  
+
   // [Important] image.src is asynchronous operation, set onload to handle after the image is loaded
-  image.onload = function() { 
+  image.onload = function() {
     if (loadedCallback) {loadedCallback(image);}
   };
-    
+
   progressFetchBlob(url, {method: "get"}, onProgressHandler)
   .then(responseBlob => {
     const objectUrl = URL.createObjectURL(responseBlob);
@@ -553,10 +553,10 @@ function loadImage({url, image = new Image(), loadedCallback, loadingCallback}) 
 function progressFetchBlob(url, opts={}, onProgressHandler) {
   return new Promise((resolve, reject) => {
     let xhr = new XMLHttpRequest();
-    
+
     xhr.responseType = "blob";
     xhr.open(opts.method || "get", url);
-    
+
     if (opts.headers) {
       Object.keys(opts.headers).map( key => xhr.setRequestHeader(key, opts.headers[key]) );
     }
@@ -579,7 +579,7 @@ const defaultSetting = {
   container: document.body,
   // the image url of the panorama
   url: undefined,
-  
+
   // the field of view
   fov: 75,
   // the inital degree of the camerea view, default is [0,0] which means to look front on the horizon
@@ -594,7 +594,7 @@ const defaultSetting = {
 
 /**
  * Fill the setting with default ones, except the exclude ones match the `excludeKeys`.
- * 
+ *
  * @param {Object} setting  The object literal that is target setting, whose missing entries will be filled with default ones.
  * @param {Object} defaultSetting  The object literal  contains default setting entries
  * @param {Set} [excludeKeys=Set(0)] Will NOT copy the entry that is in the exclude keys, default is empty set that there is no exclude keys
@@ -612,7 +612,7 @@ function handleSetting(setting){
   setting = setting || {};
   const objectSettingKeys = ["sphere"]; // the setting entry value is object.
 
-  // thes option must be contained 
+  // thes option must be contained
   if (!setting.url || typeof setting.url !== "string") {
     throw Error("Missing `url` in `setting` or The type of `url` isn't correct: the image url must be passed in `setting`, and it should be string.");
   }
@@ -628,11 +628,11 @@ function handleSetting(setting){
   return setting;
 }
 
-/* 
+/*
   JS helper function
  */
 function isPowerOf2(value){
-  return (value & (value - 1)) === 0; // binary bit operation trick 
+  return (value & (value - 1)) === 0; // binary bit operation trick
 }
 
 // curry function. let addone = curry(add, 1); let x = addone(3) // x is 4
