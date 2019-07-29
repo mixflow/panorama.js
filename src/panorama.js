@@ -473,24 +473,24 @@ const userControlHandler = function (draggingCallback, endDragCallback, isTouch,
 
 
 const loadingProgressFactory = function(parent, text=""){
-  let loadingWrapper = undefined; // store DOMElement later
+  let progressWrapper = undefined; // store DOMElement later
   let progressBar = undefined;
   let message = undefined;
   let percentageNumEl = undefined;
 
   // the actual function
   function createOrUpdate(loaded, total) {
-    if (typeof loadingWrapper === "undefined") {
+    if (typeof progressWrapper === "undefined") {
       // create DOMELement of the progress bar
-      loadingWrapper = document.createElement("div");
-      loadingWrapper.className = clazz.loadingWrapper;
+      progressWrapper = document.createElement("div");
+      progressWrapper.className = clazz.progressWrapper;
 
       progressBar = document.createElement("div");
-      loadingWrapper.appendChild(progressBar);
+      progressWrapper.appendChild(progressBar);
       progressBar.className = clazz.progressBar;
 
-      loadingWrapper.appendChild(progressBar);
-      parent.appendChild(loadingWrapper);
+      progressWrapper.appendChild(progressBar);
+      parent.appendChild(progressWrapper);
     }
 
     if(text && typeof message === "undefined"){
@@ -515,7 +515,7 @@ const loadingProgressFactory = function(parent, text=""){
       percentageNumEl = document.createElement("div");
       percentageNumEl.className = clazz.percentageNum;
 
-      loadingWrapper.appendChild(percentageNumEl);
+      progressWrapper.appendChild(percentageNumEl);
     }
     percentageNumEl.innerText = percentageNum;
   }
@@ -525,15 +525,15 @@ const loadingProgressFactory = function(parent, text=""){
     message.className = clazz.progressMessage;
     message.innerText = text;
 
-    loadingWrapper.appendChild(message);
+    progressWrapper.appendChild(message);
   }
 
   function hide(){
-    loadingWrapper.style.display = "none";
+    progressWrapper.style.display = "none";
   }
 
   function show(){
-    loadingWrapper.style.display = "block";
+    progressWrapper.style.display = "block";
   }
 
   return {createOrUpdate, hide, show};
