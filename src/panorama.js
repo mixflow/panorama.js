@@ -345,6 +345,22 @@ function panorama(setting) {
   });
 
 
+
+  const deviceOrientationHelper = createDeviceOrientationHelper((deltaAlpha, deltaBeta) => {
+    // delta values are calculated in degrees. convert those to latlon radians and use directly
+    const deltaLon = degreeToRadian(deltaAlpha);
+    const deltaLat = degreeToRadian(deltaBeta);
+
+    latitude -= deltaLat;
+    longitude -= deltaLon;
+    targetPosition = latlonToVertex(latitude, longitude);
+    needToRedraw = true;
+
+  });
+  // reigster device orientation event to window.
+  window.addEventListener("deviceorientation", deviceOrientationHelper.handler, true);
+
+
   /**
    * Check the display size(`canvas.clientWidth` and `canvas.clientHeight`) whether it's changed.
    * Update the canvas render size(`canvas.width` and `canvas.height`) to the current display size.
@@ -423,6 +439,43 @@ function latlonToVertex(latitude, longitude){
 
   return [ux, uy, uz];
 }
+
+const createDeviceOrientationHelper = function (callback) {
+  let enabled = true;
+
+  let alphaBefore, betaBefore;
+  function deviceOrientationHandler(event) {
+    if (enabled) { // record motion(orientation) data
+      const {alpha, beta} = event; // current orientation data
+
+      if (typeof alphaBefore === "undefined") {
+        // no data recorded before, set previous value directly.
+        alphaBefore = alpha;
+        betaBefore = beta;
+      }
+
+      // calculate the delta, then invoke callback
+      const deltaAlpha = alpha - alphaBefore;
+      const deltaBeta = beta - betaBefore;
+      // record data
+      alphaBefore = alpha;
+      betaBefore = beta;
+
+      // invoke callback
+      callback(deltaAlpha, deltaBeta);
+
+    } else { // disable orientation
+      alphaBefore = undefined;
+      betaBefore = undefined;
+    }
+  }
+
+  return {
+    handler: deviceOrientationHandler,
+    enable : () => enabled=true,
+    disable: () => enabled=false
+  };
+};
 
 /**
  * Generate the three event handler for user's input control when is dragging.
@@ -735,7 +788,8 @@ function curry(method){
 }
 
 /* DEV-START */
-const __testonly__ = {userCameraDegreeToLatLon, loadImage, progressFetchBlob, defaultSetting, handleSetting, degreeToRadian, radianToDegree, curry};
+const __testonly__ = {createDeviceOrientationHelper, userCameraDegreeToLatLon, loadImage,
+  progressFetchBlob, defaultSetting, handleSetting, degreeToRadian, radianToDegree, curry};
 export {__testonly__};
 /* DEV-END */
 

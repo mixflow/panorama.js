@@ -1,6 +1,71 @@
 import {__testonly__ as api} from "../src/panorama";
 
-const {userCameraDegreeToLatLon} = api;
+const {userCameraDegreeToLatLon, createDeviceOrientationHelper} = api;
+
+describe("device motion(orientation) control the camere", ()=>{
+  test(`disable to reset(clear) previous data, not cause
+  problems(not exists movement) when enable again later.`, done => {
+    let times = 0;
+    let cb = (deltaAlpha, deltaBeta) => {
+      times += 1;
+      if(times === 1) {
+        expect(deltaAlpha).toBe(0);
+        expect(deltaBeta).toBe(0);
+      } else if(times === 2) {
+        expect(deltaAlpha).toBe(0);
+        expect(deltaBeta).toBe(0);
+        done();
+      }
+    };
+
+    const helper = createDeviceOrientationHelper(cb);
+    // any event motion data is fine, because no actual non-zero delta will generate
+    helper.handler({alpha: 30, beta: 30}); // triggle callback first time
+    helper.disable(); // disable
+    helper.handler({alpha: 50, beta: 100}); // should NOT triggle  callback because disabled
+    helper.enable(); // enable again
+    // triggle callback second time. but the deltas should be zeros
+    helper.handler({alpha: 300, beta: 187});
+  });
+
+  test(`some device motion, the delta(changed value) is the
+  difference between two events`, done=>{
+    let times = 0; // the callback times that invoke to diff results
+    const diffAlpha = 30, diffBeta = 135;
+
+    let cb = (deltaAlpha, deltaBeta) => {
+      times += 1;
+      if(times === 1) { // first call
+        expect(deltaAlpha).toBe(0);
+        expect(deltaBeta).toBe(0);
+      } else if (times === 2) { // second call
+        expect(deltaAlpha).toBe(diffAlpha);
+        expect(deltaBeta).toBe(diffBeta);
+        done(); // finish
+      }
+    };
+
+    const helper = createDeviceOrientationHelper(cb);
+    let mockEvent1 = {alpha:0, beta:0};
+    let mockEvent2 = {alpha: diffAlpha, beta: diffBeta};
+
+    helper.handler(mockEvent1); // mock triggle event first time
+    helper.handler(mockEvent2); // mock triggle second time
+  });
+
+  test("no device motion, no change", (done)=>{
+    let cb = (deltaAlpha, deltaBeta) => {
+      expect(deltaAlpha).toBe(0);
+      expect(deltaBeta).toBe(0);
+
+      done();
+    };
+    const helper = createDeviceOrientationHelper(cb);
+    let mockEvent = {alpha:0, beta:0};
+
+    helper.handler(mockEvent);
+  });
+});
 
 describe("camera degree(user input degree) to latitude and longitude", ()=>{
 
