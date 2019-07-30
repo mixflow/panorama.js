@@ -161,8 +161,7 @@ function panorama(setting) {
    * Why make user setting and actual data such different?
    * Anwser: easy for use. `[0,0]`as startpoint matches the man's intuition.
    */
-  let latitude =  -degreeToRadian(cameraDegree[1]) + (Math.PI / 2);
-  let longitude =  degreeToRadian(cameraDegree[0]); // trans to radian directly
+  let {latitude, longitude} = userCameraDegreeToLatLon(cameraDegree);
   let targetPosition = latlonToVertex(latitude, longitude); // camera target position
 
   function drawScene(gl, programInfo, buffers) {
@@ -383,6 +382,23 @@ function panorama(setting) {
 
   return {container};
 } // [end] function panorama
+
+/**
+ * Convert user input camere degree to actual longitude and latitude that
+ * are used for camera lookAt poisition matrix.
+ * Because latlon are in radians. For easy use, the user input is in degree.
+ * Also the latitude ranges from 0 to PI that are like North Pole and South Pole on the Earth,
+ * Correspond to latitude, the user input vertical degree ranges from 90 to -90 that
+ * is reversed order of latitude and is offset half of PI.
+ *
+ * @param {Number Array} degree  two number array contains the horizonal degree and
+ *  the vertical degree.
+ */
+function userCameraDegreeToLatLon(degree){
+  let latitude =  -degreeToRadian(degree[1]) + (Math.PI / 2);
+  let longitude =  degreeToRadian(degree[0]); // trans to radian directly
+  return {latitude: latitude, longitude: longitude};
+}
 
 // compute the radian of the degree. 90deg -> PI/2; 180deg -> PI; 45deg-> PI/4;
 const degreeToRadian = (deg) => (deg / 180 * Math.PI);
@@ -719,7 +735,7 @@ function curry(method){
 }
 
 /* DEV-START */
-const __testonly__ = {loadImage, progressFetchBlob, defaultSetting, handleSetting, degreeToRadian, radianToDegree, curry};
+const __testonly__ = {userCameraDegreeToLatLon, loadImage, progressFetchBlob, defaultSetting, handleSetting, degreeToRadian, radianToDegree, curry};
 export {__testonly__};
 /* DEV-END */
 
