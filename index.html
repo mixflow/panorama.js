@@ -10,6 +10,11 @@
         #viewer {
             width: 1000px;
             height: 600px;
+
+            max-width: 90vw;
+            max-height: 90%;
+
+            margin: auto;
         }
     </style>
 </head>
@@ -17,11 +22,11 @@
     <div id="viewer"></div>
     <script>
         const viewer = document.getElementById("viewer");
-        
+
         let panoramajs = panorama({
             container: viewer,
             url: "images/Forest-Day_Left.jpg",
-        
+
         });
     </script>
 </body>
