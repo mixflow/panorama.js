@@ -7,7 +7,7 @@ describe("load image", ()=>{
   beforeEach(() => { // setup: mock the fetch. beforeEach can handle asynchoronial code
     // window.fetch = jest.fn().mockImplementation((url) => {
     //   return Promise.resolve({
-    //     ok: true, 
+    //     ok: true,
     //     blob: () => Promise.resolve(new Blob(["mock image blob"])),
 
     //     headers: { get: (header) => ({"Content-Length": 20}[header]) },
@@ -38,7 +38,7 @@ describe("load image", ()=>{
           this._onloadHandler(this.onload);
         },
         responseType: "text", // mock text and blob
-        
+
         readyState: 4,
         response: "",
     };
@@ -52,7 +52,7 @@ describe("load image", ()=>{
       // Define the property setter
       set(input) {
         _src = input;
-        if (!input) { 
+        if (!input) {
           // Call with setTimeout to simulate async loading
           setTimeout(() => this.onerror(new Error('mocked error')));
         } else {
@@ -74,9 +74,8 @@ describe("load image", ()=>{
         expect(loaded/total).toBe(0.5);
       } else if (times == 2) {
         expect(loaded).toBe(total);
+        done();
       }
-
-      done();
     }
     progressFetchBlob("mockimageurl/image.png", {method:"get"}, onProgressHandler);
   });
@@ -84,7 +83,7 @@ describe("load image", ()=>{
   test("progress percentage when loading", done=> {
     let times = 0;
     function loadingCallback (current, total) {
-      times += 1; 
+      times += 1;
       if (times == 1) {
         expect(current/total).toBe(0.5);
       }else if (times == 2) {
@@ -103,7 +102,7 @@ describe("load image", ()=>{
       expect(image.src).toMatch(/mockObjectUrl/);
       done();
     }
-    
+
     loadImage({url: "mockimageurl/image.png", loadedCallback});
   });
 });
@@ -112,12 +111,12 @@ describe("load image", ()=>{
 const newMinSetting = () => ({url: "fake url"});
 
 describe("If user has partial sphere settings(only radius is set), it would fill missing sphere settings with default ones", () => {
-  
+
   const radius = 15;
   let setting = newMinSetting();
   // only set radius
   setting.sphere = {radius: radius};
-  
+
   let sphereSetting = handleSetting(setting).sphere;
 
   test("the radius should be user's value", ()=>{
@@ -126,7 +125,7 @@ describe("If user has partial sphere settings(only radius is set), it would fill
   // check whether other sphere settings are filled.
   const defaultKeys = Object.keys(sphereSetting).filter(key => key !== "radius"); // exclude the radius entry
   test("the parts that are filled with defaults should NOT be empty", ()=>{
-    expect(defaultKeys.length).toBeGreaterThan(0); // not empty 
+    expect(defaultKeys.length).toBeGreaterThan(0); // not empty
   });
   test("the missing sphere setting are same as default values", ()=>{
     defaultKeys.map(key => expect(sphereSetting[key]).toBe(defaultSetting.sphere[key]));
@@ -139,7 +138,7 @@ test("get DOMelement when user setting's container is string", () => {
   target.classList.add("theOne", "savior");
 
   document.body.appendChild(target);
-  
+
   const selectors = ["#Neo", ".theOne", ".savior"];
   selectors.map( selector => {
     let setting = newMinSetting();
@@ -155,13 +154,13 @@ test("test default container is DOM body", () => {
 });
 
 test("required url in setting", () => {
-  expect(handleSetting).toThrow(/url/); 
+  expect(handleSetting).toThrow(/url/);
   expect(() => handleSetting({url:""})).toThrow(/url/);
 });
 
 test('push missing settings with defaults', () => {
   let setting = newMinSetting();
-  
+
   const defaultKeys = Object.keys(defaultSetting).filter( key => !(key in setting));
 
   const newSetting= handleSetting(setting);
