@@ -335,14 +335,14 @@ function panorama(setting) {
   const mouseEventTypes = ["mousedown", "mousemove", "mouseup"];
 
   Object.keys(mouseEventHandlers).map((key, idx) => {
-    canvas.addEventListener(mouseEventTypes[idx], mouseEventHandlers[key], false);
+    wrapper.addEventListener(mouseEventTypes[idx], mouseEventHandlers[key], false);
   });
 
   // register touch drag events
   const touchEventTypes = ["touchstart", "touchmove", "touchend"];
 
   Object.keys(touchEventHandlers).map((key, idx) => {
-    canvas.addEventListener(touchEventTypes[idx], touchEventHandlers[key], false);
+    wrapper.addEventListener(touchEventTypes[idx], touchEventHandlers[key], false);
   });
 
 
