@@ -39,6 +39,6 @@ Only one external lib `m4.js` from [webglfundametals.org](https://webglfundament
 </script>
 ```
 
-See full code in the `index.html` file.
+See full code in the [`index.html`](index.html) file.
 
 
