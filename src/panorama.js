@@ -276,11 +276,16 @@ function panorama(setting) {
     }
   } //[end] drawScene function
 
-  const {updateCamera, finishUpdateCamera} = (function(){
+  const {beforeUpdateCamera, updateCamera, finishUpdateCamera} = (function(){
     // store current latitude and longitude during dragging.
     // only update the actual latitude and longitude after finish dragging.
     let lat;
     let lon;
+
+    function beforeUpdateCamera() {
+      lat = latitude;
+      lon = longitude;
+    }
 
     /**
      *  The function to change the camera's target that it looks at,
@@ -298,8 +303,8 @@ function panorama(setting) {
       let deltaLon = deltaX / radius;
       let delatLat = deltaY / radius;
 
-      lat = delatLat+latitude;
-      lon = deltaLon+longitude;
+      latitude = delatLat+lat;
+      longitude = deltaLon+lon;
 
       // lock latitude range, not pass two poles
       const maxLat = Math.PI * (1 - 0.05);
@@ -311,23 +316,23 @@ function panorama(setting) {
       }
 
       // compute the lookAt vertice.
-      targetPosition = latlonToVertex(lat, lon);
+      targetPosition = latlonToVertex(latitude, longitude);
 
       needToRedraw = true; // redraw the scene
     }
 
     function finishUpdateCamera() {
       // update the actual varible latitude and longitude until dragging is done.
-      latitude = lat;
-      longitude = lon;
+      // latitude = lat;
+      // longitude = lon;
     }
 
-    return {updateCamera, finishUpdateCamera};
+    return {beforeUpdateCamera, updateCamera, finishUpdateCamera};
   })();
 
   // handle user input and control the camera, mouse and touch
-  let mouseEventHandlers = userControlHandler(updateCamera, finishUpdateCamera, false);
-  let touchEventHandlers = userControlHandler(updateCamera, finishUpdateCamera, true);
+  let mouseEventHandlers = userControlHandler(beforeUpdateCamera, updateCamera, finishUpdateCamera, false);
+  let touchEventHandlers = userControlHandler(beforeUpdateCamera, updateCamera, finishUpdateCamera, true);
 
 
   // register mouse drag events
@@ -488,7 +493,7 @@ const createDeviceOrientationHelper = function (callback) {
  * @param {boolean} [isTouch=false] true if user use touch device to drag and move, false otherwise(like mouse).
  * @param {number} [moveSpeed=1] the multiplier of the user movement speed, default it's 1 that is normal speed and no change.
  */
-const userControlHandler = function (draggingCallback, endDragCallback, isTouch, moveSpeed) {
+const userControlHandler = function (startDragCallback, draggingCallback, endDragCallback, isTouch, moveSpeed) {
 
   let startX = 0;
   let startY = 0;
@@ -511,6 +516,8 @@ const userControlHandler = function (draggingCallback, endDragCallback, isTouch,
     let {x, y} = getXY(event);
     startX = x;
     startY = y;
+
+    startDragCallback();
   }
 
   function moveHandler(event){
