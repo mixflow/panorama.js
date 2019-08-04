@@ -276,6 +276,11 @@ function panorama(setting) {
     }
   } //[end] drawScene function
 
+  // lock latitude range, not pass two poles
+  const maxLat = Math.PI * (1 - 0.05); // 0.95
+  const minLat = Math.PI * (0 + 0.05); // 0.05
+  const clampLatitude = curry(clamp, [minLat, maxLat]);
+
   const {beforeUpdateCamera, updateCamera, finishUpdateCamera} = (function(){
     // store current latitude and longitude during dragging.
     // only update the actual latitude and longitude after finish dragging.
@@ -306,14 +311,7 @@ function panorama(setting) {
       latitude = delatLat+lat;
       longitude = deltaLon+lon;
 
-      // lock latitude range, not pass two poles
-      const maxLat = Math.PI * (1 - 0.05);
-      const minLat = Math.PI * (0 + 0.05);
-      if (lat > maxLat) {
-        lat = maxLat;
-      } else if (lat < minLat) {
-        lat = minLat;
-      }
+      latitude = clampLatitude(latitude);
 
       // compute the lookAt vertice.
       targetPosition = latlonToVertex(latitude, longitude);
@@ -358,6 +356,10 @@ function panorama(setting) {
 
     latitude -= deltaLat;
     longitude -= deltaLon;
+
+    // clamp latitude bewteen south and north poles.
+    latitude = clampLatitude(latitude);
+
     targetPosition = latlonToVertex(latitude, longitude);
     needToRedraw = true;
 
@@ -779,7 +781,29 @@ function handleSetting(setting){
 
 /*
   JS helper function
+*/
+
+/**
+ * Clamp the value between min and max inclusively.
+ * @param {Number Array} range the Array contains min and max.
+ * @param {Number} x the target value will be clamped.
+ * @return {Number} the clamped result number.
  */
+function clamp(range, x){
+  if(!range || range.length < 2){
+    throw Error(`Value Error: The 'range' argument: '${range}',
+      which is passed in 'clamp' function isn't a array of two numbers.
+      It must contain min and max value. `);
+  }
+  const min = range[0], max = range[1];
+  if (x < min) {
+    x = min;
+  }else if (x > max) {
+    x = max;
+  }
+  return x;
+}
+
 function isPowerOf2(value){
   return (value & (value - 1)) === 0; // binary bit operation trick
 }
@@ -795,7 +819,8 @@ function curry(method){
 }
 
 /* DEV-START */
-const __testonly__ = {createDeviceOrientationHelper, userCameraDegreeToLatLon, loadImage,
+const __testonly__ = {clamp,
+  createDeviceOrientationHelper, userCameraDegreeToLatLon, loadImage,
   progressFetchBlob, defaultSetting, handleSetting, degreeToRadian, radianToDegree, curry};
 export {__testonly__};
 /* DEV-END */
