@@ -1,6 +1,5 @@
 import {createOrientationSwitchHelper, __testonly__ as api} from "../src/user-interface";
 import clazz from "../src/css/panorama.less";
-import { updateExpression } from "@babel/types";
 
 const {createEl} = api;
 
