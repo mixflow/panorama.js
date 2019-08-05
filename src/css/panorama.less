@@ -53,3 +53,31 @@
   color: @base-color;
   float: right;
 }
+
+@controlButtonSize: 44px;
+@controlPadding: 8px;
+.uiControlPanel{
+  /* make one whole line bar, put on the bottom */
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+
+  height: @controlButtonSize;
+
+  padding: @controlPadding @controlPadding;
+}
+
+.orientationSwitch{
+  display: inline-block;
+
+  height: @controlButtonSize;
+  width: @controlButtonSize;
+
+  background-color: white;
+  // background-image: url();
+
+  &.disabled{
+    background-color: black;
+    // background-image: url();
+  }
+}

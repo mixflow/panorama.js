@@ -4,6 +4,7 @@ import m4  from './utils/m4';
 import { initShaderProgram, createSphereVertices } from './webgl-helper';
 
 import clazz from "./css/panorama.less";
+import {createOrientationSwitchHelper} from "./user-interface";
 
 /**
  * Panorama.js. create panorama
@@ -45,6 +46,19 @@ function panorama(setting) {
   wrapper.appendChild(overlay);
 
   const gl = canvas.getContext("webgl"); // gl: WebGLRenderingContext
+
+  // UI controls
+
+  // main panel that holds all control buttons
+  const uiControlPanel = document.createElement("div");
+  uiControlPanel.className = clazz.uiControlPanel;
+  wrapper.appendChild(uiControlPanel);
+
+  // the device orientation switch to enable and disable the orientation to control cameras
+  const orientationSwitchHelper = createOrientationSwitchHelper(uiControlPanel);
+  const orientationSwitch = orientationSwitchHelper.create(setting.device);
+  // init status of the switch
+  orientationSwitchHelper.updateStatus(setting.deviceOrientationEnabled);
 
   // not support Webgl
   if (gl === null) {
@@ -366,6 +380,13 @@ function panorama(setting) {
   });
   // reigster device orientation event to window.
   window.addEventListener("deviceorientation", deviceOrientationHelper.handler, true);
+  // bind click event on switch
+  orientationSwitch.addEventListener("click", function(event) {
+    const enabled = orientationSwitchHelper.clickAndFlipStatus(); // update switch status
+    deviceOrientationHelper.setEnabled(enabled);
+  }, false);
+  // init status
+  deviceOrientationHelper.setEnabled(setting.deviceOrientationEnabled);
 
 
   /**
