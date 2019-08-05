@@ -747,7 +747,11 @@ const defaultSetting = {
     radius: 30,
     numVerticalSegments: 16, // the number of the vertical segments. Like Earth's meridians,the line going pole to pole.
     numHorizonalSegements: 8 // the number of the horizonal segments. Like Earth's parallels.
-  }
+  },
+
+  // whether or not to use the device's orientation(ceilphone oritation) to control the camera.
+  // Be careful! Newer browsers may need the deviceorientation must be used in HTTPS.
+  deviceOrientationEnabled: true,
 };
 
 /**
