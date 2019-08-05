@@ -21,11 +21,20 @@ describe("device motion(orientation) control the camere", ()=>{
     const helper = createDeviceOrientationHelper(cb);
     // any event motion data is fine, because no actual non-zero delta will generate
     helper.handler({alpha: 30, beta: 30}); // triggle callback first time
-    helper.disable(); // disable
+    helper.setEnabled(false); // disable
     helper.handler({alpha: 50, beta: 100}); // should NOT triggle  callback because disabled
-    helper.enable(); // enable again
+    helper.setEnabled(true); // enable again
     // triggle callback second time. but the deltas should be zeros
     helper.handler({alpha: 300, beta: 187});
+  });
+
+  test("disable and the alphaBefore, betaBefore variable should be reset to undefined", ()=>{
+    // no callback and should not excute callback;
+    const helper = createDeviceOrientationHelper();
+    helper.setEnabled(false);
+    const {alphaBefore, betaBefore} = helper.getBeforeValue();
+    expect(alphaBefore).toBeUndefined();
+    expect(betaBefore).toBeUndefined();
   });
 
   test(`some device motion, the delta(changed value) is the

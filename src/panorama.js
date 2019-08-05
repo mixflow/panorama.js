@@ -477,10 +477,17 @@ const createDeviceOrientationHelper = function (callback) {
     }
   }
 
+  function setEnabled(bool) {
+    enabled = bool;
+  }
+
   return {
     handler: deviceOrientationHandler,
-    enable : () => enabled=true,
-    disable: () => enabled=false
+    setEnabled
+    /* DEV-START */
+    // only for unit test. those are private variable, should be exposed.
+    ,getBeforeValue: () => ({alphaBefore,betaBefore})
+    /* DEV-END */
   };
 };
 
