@@ -12,6 +12,20 @@ describe("the switch controls device orientation enable or disable", ()=>{
   // helper function to quickly generate the switchHelper
   const createSwitchHelper = ()=>createOrientationSwitchHelper(document.body);
 
+  test("test 'clickAndFilpStatus' fn, switch status back and forth", ()=>{
+    const helper = createSwitchHelper();
+    const el = helper.create();
+
+    // default false to true
+    let status = helper.clickAndFlipStatus();
+    expect(status).toBeTruthy();
+    expect(contains(el, clazz.disabled)).toBe(false);
+    // enabledStatus: true to false
+    status = helper.clickAndFlipStatus();
+    expect(status).toBe(false);
+    expect(contains(el, clazz.disabled)).toBeTruthy();
+  });
+
   test("change enable and disable status", ()=>{
     const helper = createSwitchHelper();
     const el = helper.create();
