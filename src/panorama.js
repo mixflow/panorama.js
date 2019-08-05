@@ -539,7 +539,9 @@ const userControlHandler = function (startDragCallback, draggingCallback, endDra
 
 
   function startHandler(event){
-    event.preventDefault();
+    if(isTouch !== true){ // DO NOT prevent when is touch event. cause touch dragging problem and touch click not work.
+      event.preventDefault();
+    }
 
     isUserDragging = true;
 
