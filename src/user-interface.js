@@ -49,9 +49,13 @@ function createOrientationSwitchHelper(parent) {
  * @param {string} [setting.tagName="span"] the switch's DOM element tag, default is "span".
  * @return {Object Literal} return a object literal containsthe functions that to create and filp the switch.
  */
-function switchHelper({parent, className, onStateClassName, offStateClassName, tagName}={tagName: "span"}) {
+function switchHelper({parent, className, onStateClassName, offStateClassName, tagName}) {
   let el;
   let state;
+
+  if(!tagName) {
+    tagName = "span";
+  }
 
   /**
    * Create the DOM elemnet of the switch.
