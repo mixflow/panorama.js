@@ -24,7 +24,7 @@ function createFullscreenButton(container) {
  * Create a DOMElement that is used to switch orientation status. Provide
  * the functions that enable and disable the orientation to work together.
  *
- * @param {DOMElement} parent the parent DOMElement contains this switch
+ * @param {Element} parent the parent DOMElement contains this switch
  */
 function createOrientationSwitchHelper(parent) {
   return switchHelper({
@@ -40,7 +40,7 @@ function createOrientationSwitchHelper(parent) {
  * the classname to change when the state is changed(on or off).
  *
  * @param {Object Literal} setting contains the settings of switch
- * @param {DOMElement} setting.parent  the parent container, the switch would be put into it.
+ * @param {Element} setting.parent  the parent container, the switch would be put into it.
  * @param {string|string array} setting.className the switch's css class name. can be either one or multi ones.
  * @param {string|string array} [setting.onStateClassName=undefined] the switch on state class name,
  *  when switch is on, the DOM element would contains this classname. otherwise remove the classname when switch is off
@@ -56,7 +56,7 @@ function switchHelper({parent, className, onStateClassName, offStateClassName, t
   /**
    * Create the DOM elemnet of the switch.
    * @param {boolean} state the init state of the switch when is created. false is off true is on
-   * @return {DOMElement} the created DOM element.
+   * @return {Element} the created DOM element.
    */
   function create(state=false) {
     if (typeof el === "undefined") { // create if not exists before
@@ -95,7 +95,7 @@ function switchHelper({parent, className, onStateClassName, offStateClassName, t
   }
 
   /**
-   * @return {DOMElement} get the reference of the switch's DOM element
+   * @return {Element} get the reference of the switch's DOM element
    */
   function get(){
     return el;
@@ -117,7 +117,7 @@ function switchHelper({parent, className, onStateClassName, offStateClassName, t
  *  string specifies class name that can be single one or multi ones, e.g "my-button", "my-button disabled";
  *  also could be a string or string array contains a butch of class names, e.g ["my-button", "disabled"].
  *
- * @return {DOMElement} the DOM element that is created
+ * @return {Element} the DOM element that is created
  */
 function createEl(tagName, classNames="") {
   const el = document.createElement(tagName);

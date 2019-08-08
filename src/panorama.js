@@ -10,7 +10,7 @@ import {createOrientationSwitchHelper} from "./user-interface";
  * Panorama.js. create panorama
  *
  * @param {Object} setting  the setting of panorama.js.
- * @param {string|DOMElement} [setting.container=document.body] To specify which container that the panorama puts in, can be either css selector string(like "#id" ".clazzname" "div#id") or DOMElement(like document.querySelector("#id"), document.getElementById("id") ).
+ * @param {string|Element} [setting.container=document.body] To specify which container that the panorama puts in, can be either css selector string(like "#id" ".clazzname" "div#id") or DOMElement(like document.querySelector("#id"), document.getElementById("id") ).
  * @param {string} setting.src the image url of the actual panorama.
  * @param {number} [setting.fov=90] the Field Of View in degrees, the camera view angle scope.
  * @param {number array} [setting.cameraDegree=[0,0]] two numbers represent the horizonal and vertical degrees of camera,
