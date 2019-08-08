@@ -44,7 +44,7 @@ describe("the switch controls device orientation enable or disable", ()=>{
 });
 
 describe("switch helper use to create and track state when flip", ()=>{
-  const switcher = switchHelper({parent: document.body, classname: "switch fortest", offStateClassname: "off"});
+  const switcher = switchHelper({parent: document.body, className: "switch fortest", offStateClassName: "off"});
   let el;
 
   test("create with init state", ()=>{

@@ -29,8 +29,8 @@ function createFullscreenButton(container) {
 function createOrientationSwitchHelper(parent) {
   return switchHelper({
     parent: parent,
-    classname: clazz.orientationSwitch,
-    offStateClassname: clazz.disabled,
+    className: clazz.orientationSwitch,
+    offStateClassName: clazz.disabled,
   });
 }
 
@@ -41,11 +41,11 @@ function createOrientationSwitchHelper(parent) {
  *
  * @param {Object Literal} setting contains the settings of switch
  * @param {DOMElement} setting.parent  the parent container, the switch would be put into it.
- * @param {string|string array} setting.classname the switch's css class name. can be either one or multi ones.
+ * @param {string|string array} setting.className the switch's css class name. can be either one or multi ones.
  * @param {string} [setting.tagName="span"] the switch's DOM element tag, default is "span".
  * @return {Object Literal} return a object literal containsthe functions that to create and filp the switch.
  */
-function switchHelper({parent, classname, offStateClassname, tagName}={tagName: "span"}) {
+function switchHelper({parent, className, offStateClassName, tagName}={tagName: "span"}) {
   let el;
   let state;
 
@@ -56,7 +56,7 @@ function switchHelper({parent, classname, offStateClassname, tagName}={tagName: 
    */
   function create(state=false) {
     if (typeof el === "undefined") { // create if not exists before
-      el = createEl(tagName, classname);
+      el = createEl(tagName, className);
       parent.appendChild(el); // put inside of the container.
     }
     updateState(state);
@@ -71,10 +71,10 @@ function switchHelper({parent, classname, offStateClassname, tagName}={tagName: 
    */
   function updateState(_state) {
     state = _state;
-    if (!state) { // off state add off classname
-      el.classList.add(offStateClassname);
-    } else { // otherwise on state remove off classname
-      el.classList.remove(offStateClassname);
+    if (!state) { // off state add off className
+      el.classList.add(offStateClassName);
+    } else { // otherwise on state remove off className
+      el.classList.remove(offStateClassName);
     }
   }
 
