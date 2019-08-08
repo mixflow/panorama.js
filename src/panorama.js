@@ -56,9 +56,7 @@ function panorama(setting) {
 
   // the device orientation switch to enable and disable the orientation to control cameras
   const orientationSwitchHelper = createOrientationSwitchHelper(uiControlPanel);
-  const orientationSwitch = orientationSwitchHelper.create(setting.device);
-  // init status of the switch
-  orientationSwitchHelper.updateState(setting.deviceOrientationEnabled);
+  const orientationSwitch = orientationSwitchHelper.create(setting.deviceOrientationEnabled); // init status of the switch
 
   // not support Webgl
   if (gl === null) {
