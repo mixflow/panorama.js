@@ -4,7 +4,11 @@ import m4  from './utils/m4';
 import { initShaderProgram, createSphereVertices } from './webgl-helper';
 
 import clazz from "./css/panorama.less";
-import {createOrientationSwitchHelper} from "./user-interface";
+import {
+  createOrientationSwitchHelper,
+  createFullscreenSwitchHelper,
+  toggleFullscreen
+} from "./user-interface";
 
 /**
  * Panorama.js. create panorama
@@ -58,6 +62,15 @@ function panorama(setting) {
   // the device orientation switch to enable and disable the orientation to control cameras
   const orientationSwitchHelper = createOrientationSwitchHelper(uiControlPanel);
   const orientationSwitch = orientationSwitchHelper.create(setting.deviceOrientationEnabled); // init status of the switch
+
+  // fullscreen DOM Element and toggle fullscreen
+  const fullscreenSwitchHelper = createFullscreenSwitchHelper(uiControlPanel);
+  const fullscreenSwitch = fullscreenSwitchHelper.create(false);
+
+  fullscreenSwitch.addEventListener("click", function(){
+    fullscreenSwitchHelper.flip();
+    toggleFullscreen(wrapper);
+  }, false);
 
   // not support Webgl
   if (gl === null) {

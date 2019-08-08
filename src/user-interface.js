@@ -4,17 +4,58 @@ The user interface parts of panorama.js. A bunch of settings of panorama to cont
 
 import clazz from "./css/panorama.less";
 
+/**
+ *
+ * @param {Element} target the target will be in fullscreen mode or exit fullscreen mode(back to normal)
+ */
+const toggleFullscreen = (function(){
+  const prefixs = ["", "webkit", "moz", "ms"];
 
-function fullscreenHandler(target) {
-  // TODO
-  return {
-    requestFullscreen: undefined,
-    exitFullscreen: undefined
+  // the methods in different broswers with corresponding prefix
+  function requestFullscreen(target) {
+    for (let i = 0; i < prefixs.length; i+=1){
+      const prefix = prefixs[i];
+      const methodName = prefix? `${prefix}RequestFullscreen` : "requestFullscreen";
+
+      if(target[methodName]){
+        target[methodName](); // call the corresponding method
+      }
+    }
+  }
+
+  function exitFullscreen() {
+    for (let i = 0; i < prefixs.length; i+=1){
+      const prefix = prefixs[i];
+      const methodName = prefix? `${prefix}ExitFullscreen` : "ExitFullscreen";
+
+      if(document[methodName]){
+        document[methodName](); // call the corresponding method
+      }
+    }
+  }
+
+  return function (target) {
+    if (!document.fullscreenElement) {
+      // document.fullscreenElement would be null, if there's no fullscreen element.
+      // only one element could be  in full-screen mode.
+      requestFullscreen(target);
+    } else {
+      exitFullscreen();
+    }
   };
-}
+})();
 
-function createFullscreenButton(container) {
-  // TODO
+/**
+ * The toggle button on user control pannel of UI. To enter or exit fullscreen.
+ *
+ * @param {Element} parent the parent DOM element to put the switch in
+ */
+function createFullscreenSwitchHelper(parent) {
+  return switchHelper({
+    parent: parent,
+    className: clazz.fullscreenSwitch,
+    onStateClassName: clazz.inFullscreen
+  });
 }
 
 
@@ -143,6 +184,9 @@ const __testonly__ = {createEl};
 /* DEV-END */
 
 export {
+  createFullscreenSwitchHelper,
+  toggleFullscreen,
+
   createOrientationSwitchHelper,
   switchHelper,
   /* DEV-START */
