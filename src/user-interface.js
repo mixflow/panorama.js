@@ -27,42 +27,79 @@ function createFullscreenButton(container) {
  * @param {DOMElement} parent the parent DOMElement contains this switch
  */
 function createOrientationSwitchHelper(parent) {
-  let el; // the switch DOMElement itself
-  let enabledStatus = false;
+  return switchHelper({
+    parent: parent,
+    classname: clazz.orientationSwitch,
+    offStateClassname: clazz.disabled,
+  });
+}
+
+/**
+ * the helper includes functions that maintance a switch conponent:
+ * create switch component, create the DOM element and also manage
+ * the classname to change when the state is changed(on or off).
+ *
+ * @param {Object Literal} setting contains the settings of switch
+ * @param {DOMElement} setting.parent  the parent container, the switch would be put into it.
+ * @param {string|string array} setting.classname the switch's css class name. can be either one or multi ones.
+ * @param {string} [setting.tagName="span"] the switch's DOM element tag, default is "span".
+ * @return {Object Literal} return a object literal containsthe functions that to create and filp the switch.
+ */
+function switchHelper({parent, classname, offStateClassname, tagName}={tagName: "span"}) {
+  let el;
+  let state;
 
   /**
-   *
-   * @param {boolean} enabled
+   * Create the DOM elemnet of the switch.
+   * @param {boolean} state the init state of the switch when is created. false is off true is on
+   * @return {DOMElement} the created DOM element.
    */
-  function create(enabled) {
+  function create(state=false) {
     if (typeof el === "undefined") { // create if not exists before
-      el = createEl("span", clazz.orientationSwitch);
+      el = createEl(tagName, classname);
       parent.appendChild(el); // put inside of the container.
     }
-    updateStatus(enabled);
+    updateState(state);
 
     return el;
   }
 
-  function updateStatus (enabled) {
-    enabledStatus = enabled;
-    if (!enabled) {
-      el.classList.add(clazz.disabled);
-    } else {
-      el.classList.remove(clazz.disabled);
+  /**
+   * change the state.
+   * @param {boolean} _state the switch state would be change to
+   *  the argument. false is off true is on.
+   */
+  function updateState(_state) {
+    state = _state;
+    if (!state) { // off state add off classname
+      el.classList.add(offStateClassname);
+    } else { // otherwise on state remove off classname
+      el.classList.remove(offStateClassname);
     }
   }
 
-  function clickAndFlipStatus(){
-    enabledStatus = !enabledStatus; // flip status
-    updateStatus(enabledStatus);
-    return enabledStatus;
+  /**
+   * flip the switch for continuous "on" or "off"
+   * @return {bool} return the current state of switch. false is off true is on.
+   */
+  function flip(){
+    state = !state; // flip state
+    updateState(state);
+    return state;
+  }
+
+  /**
+   * @return {DOMElement} get the reference of the switch's DOM element
+   */
+  function get(){
+    return el;
   }
 
   return {
     create,
-    updateStatus,
-    clickAndFlipStatus
+    get,
+    updateState,
+    flip
   };
 }
 
@@ -97,7 +134,7 @@ const __testonly__ = {createEl};
 
 export {
   createOrientationSwitchHelper,
-
+  switchHelper,
   /* DEV-START */
   __testonly__,
   /* DEV-END */

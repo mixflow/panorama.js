@@ -1,4 +1,4 @@
-import {createOrientationSwitchHelper, __testonly__ as api} from "../src/user-interface";
+import {createOrientationSwitchHelper, switchHelper, __testonly__ as api} from "../src/user-interface";
 import clazz from "../src/css/panorama.less";
 
 const {createEl} = api;
@@ -11,16 +11,16 @@ describe("the switch controls device orientation enable or disable", ()=>{
   // helper function to quickly generate the switchHelper
   const createSwitchHelper = ()=>createOrientationSwitchHelper(document.body);
 
-  test("test 'clickAndFilpStatus' fn, switch status back and forth", ()=>{
+  test("test switch flip function, switch status back and forth", ()=>{
     const helper = createSwitchHelper();
     const el = helper.create();
 
     // default false to true
-    let status = helper.clickAndFlipStatus();
+    let status = helper.flip();
     expect(status).toBeTruthy();
     expect(contains(el, clazz.disabled)).toBe(false);
     // enabledStatus: true to false
-    status = helper.clickAndFlipStatus();
+    status = helper.flip();
     expect(status).toBe(false);
     expect(contains(el, clazz.disabled)).toBeTruthy();
   });
@@ -29,10 +29,10 @@ describe("the switch controls device orientation enable or disable", ()=>{
     const helper = createSwitchHelper();
     const el = helper.create();
 
-    helper.updateStatus(false);
+    helper.updateState(false);
     expect(contains(el, clazz.disabled)).toBeTruthy();
 
-    helper.updateStatus(true);
+    helper.updateState(true);
     expect(contains(el, clazz.disabled)).toBe(false);
   });
 
@@ -40,6 +40,37 @@ describe("the switch controls device orientation enable or disable", ()=>{
     const el = createSwitchHelper().create();
     expect(contains(el, clazz.orientationSwitch)).toBeTruthy();
     expect(contains(el, clazz.disabled)).toBeTruthy();
+  });
+});
+
+describe("switch helper use to create and track state when flip", ()=>{
+  const switcher = switchHelper({parent: document.body, classname: "switch fortest", offStateClassname: "off"});
+  let el;
+
+  test("create with init state", ()=>{
+    el = switcher.create(false);
+    expect(el.className).toBe("switch fortest off");
+  });
+
+  test("get the dom element of the switch", ()=>{
+    expect(switcher.get()).toBe(el);
+  });
+
+  test("change the state of switch", ()=>{
+    switcher.updateState(true);
+    expect(contains(el, "off")).toBe(false);
+    switcher.updateState(true);
+    expect(contains(el, "off")).toBe(false);
+    switcher.updateState(false);
+    expect(contains(el, "off")).toBeTruthy();
+  });
+
+  test("flip the switch and filp the continous state on or off", ()=>{
+    switcher.updateState(false);
+    switcher.flip(); // off -> on
+    expect(contains(el, "off")).toBe(false);
+    switcher.flip(); // on -> off
+    expect(contains(el, "off")).toBeTruthy();
   });
 });
 

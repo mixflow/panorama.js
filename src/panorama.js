@@ -58,7 +58,7 @@ function panorama(setting) {
   const orientationSwitchHelper = createOrientationSwitchHelper(uiControlPanel);
   const orientationSwitch = orientationSwitchHelper.create(setting.device);
   // init status of the switch
-  orientationSwitchHelper.updateStatus(setting.deviceOrientationEnabled);
+  orientationSwitchHelper.updateState(setting.deviceOrientationEnabled);
 
   // not support Webgl
   if (gl === null) {
@@ -382,7 +382,7 @@ function panorama(setting) {
   window.addEventListener("deviceorientation", deviceOrientationHelper.handler, true);
   // bind click event on switch
   orientationSwitch.addEventListener("click", function(event) {
-    const enabled = orientationSwitchHelper.clickAndFlipStatus(); // update switch status
+    const enabled = orientationSwitchHelper.flip(); // update switch status
     deviceOrientationHelper.setEnabled(enabled);
   }, false);
   // init status
