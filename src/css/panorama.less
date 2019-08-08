@@ -62,16 +62,22 @@
   bottom: 0;
   width: 100%;
 
-  height: @controlButtonSize;
+  box-sizing: border-box; /* include padding into width and height sizes */
+
+  height: @controlButtonSize + @controlPadding * 2;
 
   padding: @controlPadding @controlPadding;
 }
 
-.orientationSwitch{
+.controlButton {
   display: inline-block;
 
   height: @controlButtonSize;
   width: @controlButtonSize;
+}
+
+.orientationSwitch{
+  composes: controlButton;
 
   background-color: white;
   // background-image: url();
