@@ -42,10 +42,14 @@ function createOrientationSwitchHelper(parent) {
  * @param {Object Literal} setting contains the settings of switch
  * @param {DOMElement} setting.parent  the parent container, the switch would be put into it.
  * @param {string|string array} setting.className the switch's css class name. can be either one or multi ones.
+ * @param {string|string array} [setting.onStateClassName=undefined] the switch on state class name,
+ *  when switch is on, the DOM element would contains this classname. otherwise remove the classname when switch is off
+ * @param {string|string array} [setting.offStateClassName=undefined] the opposite side of 'onStateClassName',
+ *  when switch is off, contains the classname, otherwise remove this one.
  * @param {string} [setting.tagName="span"] the switch's DOM element tag, default is "span".
  * @return {Object Literal} return a object literal containsthe functions that to create and filp the switch.
  */
-function switchHelper({parent, className, offStateClassName, tagName}={tagName: "span"}) {
+function switchHelper({parent, className, onStateClassName, offStateClassName, tagName}={tagName: "span"}) {
   let el;
   let state;
 
@@ -71,10 +75,12 @@ function switchHelper({parent, className, offStateClassName, tagName}={tagName: 
    */
   function updateState(_state) {
     state = _state;
-    if (!state) { // off state add off className
-      el.classList.add(offStateClassName);
-    } else { // otherwise on state remove off className
-      el.classList.remove(offStateClassName);
+    if (!state) { // off state add off className or remove on className if specified
+      if (offStateClassName) {el.classList.add(offStateClassName);}
+      if (onStateClassName) {el.classList.remove(onStateClassName);}
+    } else { // otherwise on state remove off className or add on className if specified
+      if (onStateClassName) {el.classList.add(onStateClassName);}
+      if (offStateClassName) {el.classList.remove(offStateClassName);}
     }
   }
 

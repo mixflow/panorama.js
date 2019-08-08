@@ -65,6 +65,18 @@ describe("switch helper use to create and track state when flip", ()=>{
     expect(contains(el, "off")).toBeTruthy();
   });
 
+  test("both on and off classNames are specified", ()=>{
+    const switcher = switchHelper({
+      parent: document.body, className: "dual",
+      onStateClassName: "on", offStateClassName: "off"});
+    const el = switcher.create(true); // init on
+
+    expect(el.className).toBe("dual on");
+    switcher.updateState(false);
+    expect(contains(el, "off")).toBeTruthy();
+    expect(!contains(el, "on")).toBeTruthy(); // not contain on
+  });
+
   test("flip the switch and filp the continous state on or off", ()=>{
     switcher.updateState(false);
     switcher.flip(); // off -> on
