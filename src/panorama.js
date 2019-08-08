@@ -30,6 +30,7 @@ function panorama(setting) {
   const {radius, numVerticalSegments, numHorizonalSegements} = setting.sphere;
 
   const canvas = document.createElement("canvas");
+  canvas.className = clazz.mainCanvas;
   canvas.width = container.clientWidth;
   canvas.height = container.clientHeight;
 
