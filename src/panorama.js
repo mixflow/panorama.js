@@ -413,8 +413,10 @@ function panorama(setting) {
    * @return {boolean} true: need resize; false: no need.
    */
   function resize(){
-    const clientWidth = gl.canvas.clientWidth;
-    const clientHeight = gl.canvas.clientHeight;
+    var pixelRatio = window.devicePixelRatio? window.devicePixelRatio: 1;
+
+    const clientWidth = gl.canvas.clientWidth * pixelRatio;
+    const clientHeight = gl.canvas.clientHeight * pixelRatio;
 
     if (gl.canvas.width !== clientWidth || gl.canvas.height !== clientHeight){
       gl.canvas.width = clientWidth;
