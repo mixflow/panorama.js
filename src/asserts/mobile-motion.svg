@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='ascii'?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" height="200"
+    version="1.1" width="200">
+    <g id="ViewLayer_MobileFace" inkscape:groupmode="lineset" inkscape:label="View Layer_MobileFace">
+        <g id="strokes" inkscape:groupmode="layer" inkscape:label="strokes">
+            <style>
+                .mobile-edge {}
+
+                .mobile-face {}
+            </style>
+            <path class="mobile-edge"
+                d=" M 50.470, 136.428 50.470, 146.428 50.470, 156.428 50.470, 166.428 50.470, 176.428 50.470, 186.428 50.470, 188.701 60.470, 188.701 70.470, 188.701 80.470, 188.701 90.470, 188.701 100.470, 188.701 110.470, 188.701 120.470, 188.701 130.470, 188.701 140.470, 188.701 149.530, 188.701 149.530, 178.701 149.530, 168.701 149.530, 158.701 149.530, 148.701 149.530, 138.701 149.530, 128.701 149.530, 118.701 149.530, 108.701 149.530, 98.701 149.530, 88.701 149.530, 84.984 149.530, 80.104 149.530, 70.104 149.530, 60.104 149.530, 50.104 149.530, 40.104 149.530, 30.104 149.530, 20.104 149.530, 11.299 139.530, 11.299 129.530, 11.299 119.530, 11.299 109.530, 11.299 99.530, 11.299 89.530, 11.299 79.530, 11.299 69.530, 11.299 59.530, 11.299 50.470, 11.299 50.470, 21.299 50.470, 31.299 50.470, 41.299 50.470, 51.299 50.470, 61.299 50.470, 71.299 50.470, 80.730 50.470, 85.651 50.470, 95.651 50.470, 105.651 50.470, 115.651 50.470, 125.651 50.470, 128.518 "
+                fill="none" stroke="rgb(0, 0, 0)" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0"
+                stroke-width="3.0" />
+            <path class="mobile-face"
+                d=" M 56.517, 129.102 56.517, 119.102 56.517, 109.102 56.517, 99.102 56.517, 89.102 56.517, 84.643 56.517, 79.853 56.517, 69.853 56.517, 59.853 56.517, 49.853 56.517, 39.853 56.517, 29.853 56.517, 19.853 56.517, 17.121 66.517, 17.121 76.517, 17.121 86.517, 17.121 96.517, 17.121 106.517, 17.121 116.517, 17.121 126.517, 17.121 136.517, 17.121 143.483, 17.121 143.483, 27.121 143.483, 37.121 143.483, 47.121 143.483, 57.121 143.483, 67.121 143.483, 77.121 143.483, 79.207 143.483, 83.957 143.483, 93.957 143.483, 103.957 143.483, 113.957 143.483, 123.957 143.483, 133.957 143.483, 143.957 143.483, 153.957 143.483, 163.957 143.483, 167.471 133.483, 167.471 123.483, 167.471 113.483, 167.471 103.483, 167.471 93.483, 167.471 83.483, 167.471 73.483, 167.471 63.483, 167.471 56.517, 167.471 56.517, 157.471 56.517, 147.471 56.517, 137.471 56.517, 137.048 "
+                fill="none" stroke="rgb(0, 0, 0)" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0"
+                stroke-width="3.0" />
+            <path
+                d=" M 107.848, 177.360 107.697, 178.891 107.251, 180.363 106.525, 181.720 105.549, 182.910 104.360, 183.886 103.003, 184.611 101.531, 185.057 100.000, 185.208 98.469, 185.057 96.997, 184.611 95.640, 183.886 94.451, 182.910 93.475, 181.720 92.749, 180.363 92.303, 178.891 92.152, 177.360 92.303, 175.829 92.749, 174.357 93.475, 173.000 94.451, 171.811 95.640, 170.835 96.997, 170.109 98.469, 169.663 100.000, 169.512 101.531, 169.663 103.003, 170.109 104.360, 170.835 105.549, 171.811 106.525, 173.000 107.251, 174.357 107.697, 175.829 107.848, 177.360 "
+                fill="none" stroke="rgb(0, 0, 0)" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0"
+                stroke-width="3.0" />
+        </g>
+    </g>
+    <g id="ViewLayer_Arrows" inkscape:groupmode="lineset" inkscape:label="View Layer_Arrows"
+        xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+        <style>
+            .arrow-head {
+                fill: none;
+            }
+        </style>
+        <g id="strokes" inkscape:groupmode="layer" inkscape:label="strokes"
+            xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+            <path
+                d=" M 155.990, 129.790 156.111, 131.765 155.723, 133.286 154.939, 133.943 153.976, 133.573 153.093, 132.292 152.518, 130.448 152.398, 128.522 152.764, 127.013 153.527, 126.320 154.489, 126.642 155.394, 127.910 155.990, 129.790 "
+                fill="none" stroke="rgb(0, 0, 0)" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0"
+                stroke-width="3.0" />
+            <path
+                d=" M 181.560, 118.529 181.488, 118.555 172.102, 122.007 169.363, 123.014 159.574, 125.057 153.527, 126.320 "
+                fill="none" stroke="rgb(0, 0, 0)" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0"
+                stroke-width="3.0" />
+            <path
+                d=" M 154.939, 133.943 164.702, 131.778 171.442, 130.284 180.753, 126.636 184.082, 125.333 185.386, 124.550 193.597, 118.842 193.761, 118.729 197.700, 112.591 198.359, 111.142 198.235, 105.120 197.986, 103.636 194.443, 98.091 193.489, 97.073 187.303, 92.197 178.991, 87.968 169.572, 84.607 169.093, 84.436 159.403, 81.964 158.063, 81.622 149.530, 80.104 "
+                fill="none" stroke="rgb(0, 0, 0)" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0"
+                stroke-width="3.0" />
+            <path d=" M 192.170, 108.691 191.555, 109.550 188.249, 114.174 181.488, 118.555 " fill="none"
+                stroke="rgb(0, 0, 0)" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0"
+                stroke-width="3.0" />
+            <path d=" M 191.754, 104.657 191.715, 105.610 191.555, 109.550 " fill="none" stroke="rgb(0, 0, 0)"
+                stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0" stroke-width="3.0" />
+            <path d=" M 189.014, 100.858 189.228, 101.234 191.715, 105.610 " fill="none" stroke="rgb(0, 0, 0)"
+                stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0" stroke-width="3.0" />
+            <path
+                d=" M 149.530, 84.984 156.452, 86.290 166.104, 88.904 166.987, 89.144 176.389, 92.714 184.221, 96.975 189.228, 101.234 "
+                fill="none" stroke="rgb(0, 0, 0)" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0"
+                stroke-width="3.0" />
+            <path
+                d=" M 116.755, 82.036 121.385, 82.036 131.368, 82.624 133.371, 82.741 143.300, 83.935 143.483, 83.957 "
+                fill="none" stroke="rgb(0, 0, 0)" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0"
+                stroke-width="3.0" />
+            <path d=" M 143.483, 79.207 134.021, 78.133 124.037, 77.578 121.570, 77.441 116.776, 77.441 " fill="none"
+                stroke="rgb(0, 0, 0)" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0"
+                stroke-width="3.0" />
+            <path class="arrow-head"
+                d=" M 116.803, 78.391 116.776, 77.441 116.732, 75.943 116.596, 74.548 116.433, 74.563 106.603, 76.403 96.774, 78.242 88.797, 79.735 98.626, 81.579 108.454, 83.423 116.541, 84.941 116.692, 83.617 116.755, 82.036 116.788, 81.214 116.803, 78.391 "
+                fill="none" stroke="rgb(0, 0, 0)" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0"
+                stroke-width="3.0" />
+            <path d=" M 65.691, 78.803 56.517, 79.853 " fill="none" stroke="rgb(0, 0, 0)" stroke-linecap="butt"
+                stroke-linejoin="round" stroke-opacity="1.0" stroke-width="3.0" />
+            <path
+                d=" M 66.346, 83.452 66.487, 82.843 66.502, 81.766 66.387, 80.512 66.172, 79.425 65.917, 78.801 65.691, 78.803 "
+                fill="none" stroke="rgb(0, 0, 0)" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0"
+                stroke-width="3.0" />
+            <path
+                d=" M 9.840, 102.301 14.943, 97.949 22.886, 93.605 32.227, 90.034 32.401, 89.967 42.049, 87.335 43.049, 87.062 50.470, 85.651 "
+                fill="none" stroke="rgb(0, 0, 0)" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0"
+                stroke-width="3.0" />
+            <path
+                d=" M 50.470, 80.730 41.425, 82.352 31.739, 84.841 30.276, 85.217 20.864, 88.597 20.258, 88.815 11.827, 93.127 5.530, 98.103 4.567, 99.130 0.929, 104.795 0.679, 106.294 0.492, 112.454 1.161, 113.916 5.086, 120.202 13.247, 125.982 13.513, 126.171 14.839, 126.955 24.130, 130.654 27.605, 132.037 37.361, 134.233 44.307, 135.796 50.470, 136.428 56.517, 137.048 63.857, 137.801 71.629, 137.801 "
+                fill="none" stroke="rgb(0, 0, 0)" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0"
+                stroke-width="3.0" />
+            <path d=" M 17.559, 120.123 10.674, 115.581 7.392, 110.872 6.760, 109.966 " fill="none"
+                stroke="rgb(0, 0, 0)" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0"
+                stroke-width="3.0" />
+            <path
+                d=" M 71.742, 129.868 64.444, 129.868 56.517, 129.102 50.470, 128.518 45.742, 128.061 35.959, 125.988 29.714, 124.665 20.347, 121.165 17.559, 120.123 17.395, 120.062 "
+                fill="none" stroke="rgb(0, 0, 0)" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0"
+                stroke-width="3.0" />
+            <path class="arrow-head"
+                d=" M 118.698, 133.825 108.880, 131.926 99.062, 130.028 89.244, 128.129 79.426, 126.230 72.632, 124.916 72.176, 125.729 71.790, 128.791 71.742, 129.868 71.588, 133.310 71.629, 137.801 71.631, 137.997 71.906, 141.490 72.330, 142.832 82.146, 140.925 91.963, 139.018 101.779, 137.111 111.596, 135.205 118.698, 133.825 "
+                fill="none" stroke="rgb(0, 0, 0)" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0"
+                stroke-width="3.0" />
+            <path d=" M 7.392, 110.872 7.267, 106.804 7.237, 105.821 " fill="none" stroke="rgb(0, 0, 0)"
+                stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0" stroke-width="3.0" />
+            <path d=" M 7.267, 106.804 9.840, 102.301 10.057, 101.922 " fill="none" stroke="rgb(0, 0, 0)"
+                stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1.0" stroke-width="3.0" />
+            <path d=" M 56.517, 84.643 66.346, 83.452 " fill="none" stroke="rgb(0, 0, 0)" stroke-linecap="butt"
+                stroke-linejoin="round" stroke-opacity="1.0" stroke-width="3.0" />
+        </g>
+    </g>
+</svg>
