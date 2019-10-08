@@ -7,7 +7,8 @@
     "test": "jest",
     "watch-test": "jest --watch __tests__",
     "watch": "webpack --watch",
-    "build": "webpack src/panorama.js --output dist/panorama.js"
+    "build": "webpack src/panorama.js --output dist/panorama.js",
+    "server": "http-server -S -c-1"
   },
   "author": "MixFlow",
   "license": "MIT",
@@ -23,6 +24,7 @@
     "less": "^3.9.0",
     "less-loader": "^5.0.0",
     "style-loader": "^0.23.1",
+    "svg-url-loader": "^3.0.0",
     "webpack": "^4.33.0",
     "webpack-cli": "^3.3.4",
     "webpack-strip-block": "^0.2.0"
