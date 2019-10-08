@@ -79,16 +79,18 @@
 
   height: @controlButtonSize;
   width: @controlButtonSize;
+
+  background-color: rgba(211, 211, 211, 0.6)// base color behind the icon
 }
 
 .orientationSwitch{
   composes: controlButton;
 
-  background-color: white;
-  // background-image: url();
+  background-image: url("../asserts/mobile-motion.svg");
+  background-size: contain; // fill svg
+  // background-repeat: no-repeat;
 
   &.disabled{
-    background-color: black;
     // background-image: url();
   }
 }
@@ -98,11 +100,10 @@
 
   float: right;
 
-  background-color: skyblue;
-  // background-image: url();
+  background-image: url('../asserts/fullscreen.svg');
+  background-size: contain;
 
   &.inFullscreen{
-    background-color: white;
-    // background-image: url();
+    background-image: url('../asserts/exit-fullscreen.svg');
   }
 }
