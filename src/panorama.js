@@ -624,10 +624,10 @@ const loadingProgressFactory = function(parent, text=""){
     }
 
     // update progress bar.
-    const ratio = (loaded / total).toPrecision(4);
+    const ratio = loaded / total;
     if (!Number.isNaN(ratio)) {
       // actually have percentage number
-      const percentageNum = `${ratio * 100}%`;
+      const percentageNum = `${(ratio * 100).toPrecision(3)}%`;
       progressBar.style.width = percentageNum;
 
       // show percentage number text
