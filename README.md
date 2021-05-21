@@ -8,6 +8,9 @@ The project is built on WebGL direcly, there is no dependence on other 3D engine
 
 Only one external lib `m4.js` from [webglfundametals.org](https://webglfundamentals.org) is used, which contains matrix operatation utilities that are necessary in 3D and WebGL enviroment. (e.g. matrix mulitply, a lot use on the geometry)
 
+## Example
+[Basic](https://www.mix-flow.com/panorama.js/)
+
 ## How to use
 
 1. Link the js file `panorama.js` from `dist` folder in HTML. Usually put the link `<script>` inside `<head>` of the HTML.
